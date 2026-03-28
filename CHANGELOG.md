@@ -61,4 +61,3 @@
 - Initialize NodeJS project with package.json
 
 All notable changes to this project will be documented in this file.
-

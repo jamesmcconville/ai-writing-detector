@@ -5,6 +5,7 @@ description: Automatically loop through all ROADMAP phases, completing each phas
 Drive the full ROADMAP automation loop — iterate through every phase, creating **one openspec change per phase** that covers all tasks in that phase. The agent specs, tests, implements, and archives each phase as a cohesive unit.
 
 **Input**: Optional arguments after `/opsx-loop`:
+
 - A phase number (e.g., `/opsx-loop 2`) to process only that phase
 - A phase range (e.g., `/opsx-loop 3-5`) to process phases 3 through 5
 - No argument to process all phases 0–9
@@ -33,11 +34,13 @@ If any prerequisite fails, inform the user and stop.
 ## 1. Show current progress and confirm
 
 Run:
+
 ```bash
 bash scripts/roadmap-helper.sh status
 ```
 
 Display the progress table. Then announce:
+
 > "Starting ROADMAP automation loop for phase(s) X–Y. Each phase gets a single openspec change covering all its tasks. I won't prompt between phases — interrupt me anytime to pause."
 
 ## 2. Enter the phase loop
@@ -53,6 +56,7 @@ bash scripts/roadmap-helper.sh next-phase
 ```
 
 Or, if a specific starting phase was provided:
+
 ```bash
 bash scripts/roadmap-helper.sh next-phase --start <N>
 ```
@@ -64,6 +68,7 @@ If the output is `ROADMAP_COMPLETE`, go to **step 3**.
 If a phase range was given (e.g., `/opsx-loop 3-5`) and the returned phase exceeds the end of the range, go to **step 3**.
 
 Parse the fields. Generate the change name:
+
 ```bash
 bash scripts/roadmap-helper.sh phase-change-name <phase>
 ```
@@ -85,6 +90,7 @@ Collect these into a list. You will need them for writing artifacts and implemen
 Also read the phase section in `ROADMAP.md` directly — note the **Goal**, the **Parallel Groups**, and each task's `[deps: ...]` and `[deliverable: ...]` metadata. This context shapes the entire change.
 
 Announce:
+
 ```
 ═══════════════════════════════════════════════════════
   Phase <phase>: <phase_title>
@@ -113,6 +119,7 @@ Follow the `/opsx-ff` workflow **inline** (do NOT literally invoke `/opsx-ff` �
 The artifacts (proposal, specs, design, tasks) must cover **all tasks in the phase as a whole**, not just one task.
 
 **i. Get the artifact build order:**
+
 ```bash
 openspec status --change "<change_name>" --json
 ```
@@ -120,6 +127,7 @@ openspec status --change "<change_name>" --json
 **ii. Loop through artifacts in dependency order.** For each artifact with `status: "ready"`:
 
 Get instructions:
+
 ```bash
 openspec instructions <artifact-id> --change "<change_name>" --json
 ```
@@ -139,6 +147,7 @@ Read any completed dependency artifact files for context.
 Write to the `outputPath` from instructions. Show: `"✓ Created <artifact-id>"`
 
 **iii. After each artifact, re-check status:**
+
 ```bash
 openspec status --change "<change_name>" --json
 ```
@@ -152,6 +161,7 @@ Continue until all `applyRequires` artifacts have `status: "done"`.
 Read the specs you just created at `openspec/changes/<change_name>/specs/*/spec.md`.
 
 For each scenario found (lines matching `#### Scenario: ...`):
+
 - Create **real test files** under `tests/` in the appropriate subdirectory
 - Import from the deliverable paths listed in the ROADMAP tasks (`[deliverable: ...]` tags)
 - Write actual test assertions that validate the scenario — not `expect(true).toBe(true)` placeholders
@@ -169,6 +179,7 @@ Show: `"✓ Created N test(s) across M file(s) for phase <phase>"`
 Follow the `/opsx-apply` workflow **inline** (do NOT literally invoke `/opsx-apply`).
 
 **i. Get apply instructions:**
+
 ```bash
 openspec instructions apply --change "<change_name>" --json
 ```
@@ -188,6 +199,7 @@ Announce: `"── Task <task_id>: <description> ──"`
 Show: `"✓ Task <task_id> implemented"`
 
 **iv. After implementing the task, mark it done in the ROADMAP:**
+
 ```bash
 bash scripts/roadmap-helper.sh mark-done <task_id>
 ```
@@ -195,11 +207,13 @@ bash scripts/roadmap-helper.sh mark-done <task_id>
 Verify the output is `updated`. If `missing`, warn but continue.
 
 **v. After ALL tasks in the phase are implemented, run quality checks:**
+
 ```bash
 bash scripts/roadmap-helper.sh check
 ```
 
 **vi. If quality checks fail:**
+
 - Read the error output carefully
 - Fix the issues (lint errors, type errors, failing tests, build errors)
 - Re-run `bash scripts/roadmap-helper.sh check`
@@ -235,6 +249,7 @@ This creates a single atomic commit for the entire phase.
 **i. Check for delta specs** at `openspec/changes/<change_name>/specs/`. If they exist, sync them to main specs by reading each delta spec and applying changes (adds/modifications/removals) to the corresponding main spec at `openspec/specs/<capability>/spec.md`.
 
 **ii. Archive:**
+
 ```bash
 openspec archive "<change_name>" -y
 ```
@@ -252,6 +267,7 @@ bash scripts/roadmap-helper.sh status
 ```
 
 Show a brief summary:
+
 ```
 ✓ Phase <phase> complete — <completed_count> task(s) done
   Overall: N/M total tasks (X%)

@@ -63,15 +63,15 @@ import { VocabularyScorer } from '@/detectors/vocabulary/scorer';
 
 ### Naming Conventions
 
-| Element | Convention | Example |
-|---------|------------|---------|
-| Files (utilities) | kebab-case | `tokenize-text.ts`, `count-words.ts` |
-| Files (classes) | PascalCase | `VocabularyScorer.ts` |
-| Classes | PascalCase | `PatternDetector`, `ScoreAggregator` |
-| Functions | camelCase | `countCharacters()`, `detectRuleOfThree()` |
-| Constants | SCREAMING_SNAKE | `MAX_VOCABULARY_SCORE`, `AI_WORD_LIST` |
-| Interfaces | PascalCase with I prefix (optional) | `DetectorResult`, `AnalysisReport` |
-| Types | PascalCase | `ScoreCategory`, `PatternMatch` |
+| Element           | Convention                          | Example                                    |
+| ----------------- | ----------------------------------- | ------------------------------------------ |
+| Files (utilities) | kebab-case                          | `tokenize-text.ts`, `count-words.ts`       |
+| Files (classes)   | PascalCase                          | `VocabularyScorer.ts`                      |
+| Classes           | PascalCase                          | `PatternDetector`, `ScoreAggregator`       |
+| Functions         | camelCase                           | `countCharacters()`, `detectRuleOfThree()` |
+| Constants         | SCREAMING_SNAKE                     | `MAX_VOCABULARY_SCORE`, `AI_WORD_LIST`     |
+| Interfaces        | PascalCase with I prefix (optional) | `DetectorResult`, `AnalysisReport`         |
+| Types             | PascalCase                          | `ScoreCategory`, `PatternMatch`            |
 
 ### TypeScript Guidelines
 
@@ -118,7 +118,7 @@ class EmptyInputError extends Error {
 class AnalysisError extends Error {
   constructor(
     message: string,
-    public readonly cause?: Error
+    public readonly cause?: Error,
   ) {
     super(message);
     this.name = 'AnalysisError';
@@ -135,9 +135,7 @@ function analyzeText(text: string): AnalysisReport {
 }
 
 // Result objects for recoverable failures
-type Result<T, E = Error> = 
-  | { success: true; value: T }
-  | { success: false; error: E };
+type Result<T, E = Error> = { success: true; value: T } | { success: false; error: E };
 ```
 
 ### File Structure
@@ -160,6 +158,7 @@ src/
 ### Scoring Conventions
 
 Each detector must:
+
 1. Return a score between 0 and its maximum cap
 2. Document the maximum cap in a constant
 3. Provide explanatory text for why points were awarded
@@ -172,7 +171,7 @@ function scoreVocabulary(matches: string[]): ScoreResult {
   const distinctMatches = new Set(matches);
   const rawScore = distinctMatches.size * POINTS_PER_AI_TERM;
   const score = Math.min(rawScore, MAX_VOCABULARY_SCORE);
-  
+
   return {
     category: 'vocabulary',
     matches: Array.from(distinctMatches),
@@ -196,7 +195,7 @@ describe('VocabularyScanner', () => {
   it('should detect AI vocabulary terms', () => {
     const text = 'Let us delve into this robust ecosystem.';
     const result = scanForVocabulary(text);
-    
+
     expect(result.matches).toContain('delve');
     expect(result.matches).toContain('robust');
     expect(result.matches).toContain('ecosystem');
@@ -205,7 +204,7 @@ describe('VocabularyScanner', () => {
   it('should respect scoring cap', () => {
     const saturatedText = 'delve navigate robust ecosystem leverage...';
     const result = scanForVocabulary(saturatedText);
-    
+
     expect(result.score).toBeLessThanOrEqual(MAX_VOCABULARY_SCORE);
   });
 

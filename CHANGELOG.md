@@ -1,5 +1,9 @@
 # Changelog
 
+## [2026-03-28] Phase 1 — Task 1.1
+
+- Create text tokenizer utility
+
 ## [2026-03-28] Phase 0 — Task 0.6
 
 - Prepare sample texts for testing

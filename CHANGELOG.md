@@ -1,5 +1,9 @@
 # Changelog
 
+## [2026-03-28] Phase 2: AI Vocabulary Detection
+
+- Completed 5 task(s) in phase 2
+
 ## [2026-03-28] Phase 1: Text Input & Basic Statistics
 
 - Completed 6 task(s) in phase 1

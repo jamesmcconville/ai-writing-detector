@@ -60,11 +60,11 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-- [ ] 2.1 Create AI vocabulary word list [deps: 0.4] [deliverable: `src/detectors/vocabulary/ai-words.ts` - comprehensive term list]
-- [ ] 2.2 Implement vocabulary scanner [deps: 2.1] [deliverable: `src/detectors/vocabulary/scanner.ts`]
-- [ ] 2.3 Implement phrase detector (multi-word) [deps: 2.1] [deliverable: `src/detectors/vocabulary/phrase-detector.ts`]
-- [ ] 2.4 Create vocabulary scoring system [deps: 2.2, 2.3] [deliverable: `src/detectors/vocabulary/scorer.ts` with max cap]
-- [ ] 2.5 Write tests for vocabulary detection [deps: 2.4] [deliverable: `tests/detectors/vocabulary.test.ts`]
+- [x] 2.1 Create AI vocabulary word list [deps: 0.4] [deliverable: `src/detectors/vocabulary/ai-words.ts` - comprehensive term list]
+- [x] 2.2 Implement vocabulary scanner [deps: 2.1] [deliverable: `src/detectors/vocabulary/scanner.ts`]
+- [x] 2.3 Implement phrase detector (multi-word) [deps: 2.1] [deliverable: `src/detectors/vocabulary/phrase-detector.ts`]
+- [x] 2.4 Create vocabulary scoring system [deps: 2.2, 2.3] [deliverable: `src/detectors/vocabulary/scorer.ts` with max cap]
+- [x] 2.5 Write tests for vocabulary detection [deps: 2.4] [deliverable: `tests/detectors/vocabulary.test.ts`]
 
 **Parallel Groups**:
 - Group A: 2.1 (independent)

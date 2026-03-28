@@ -148,18 +148,18 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-- [ ] 6.1 Implement Type-Token Ratio calculator [deps: 1.1] [deliverable: `src/analyzers/lexical-diversity.ts`]
-- [ ] 6.2 Implement sentence length variation analyzer [deps: 1.1] [deliverable: `src/analyzers/sentence-length.ts`]
-- [ ] 6.3 Implement passive voice detector [deps: 1.1] [deliverable: `src/analyzers/passive-voice.ts`]
-- [ ] 6.4 Create transition word list [deps: 0.4] [deliverable: `src/analyzers/transition-words.ts`]
-- [ ] 6.5 Implement transition word density analyzer [deps: 6.4] [deliverable: `src/analyzers/transition-density.ts`]
-- [ ] 6.6 Implement Flesch-Kincaid Grade Level calculator [deps: 1.1] [deliverable: `src/analyzers/flesch-kincaid.ts`]
-- [ ] 6.7 Implement punctuation pattern analyzer [deps: 1.1] [deliverable: `src/analyzers/punctuation.ts`]
-- [ ] 6.8 Create rare word dictionary/frequency list [deps: 0.4] [deliverable: `src/analyzers/rare-words.ts`]
-- [ ] 6.9 Implement rare word usage analyzer [deps: 6.8] [deliverable: `src/analyzers/rare-word-usage.ts`]
-- [ ] 6.10 Create statistical analyzer aggregator [deps: 6.1-6.9] [deliverable: `src/analyzers/aggregator.ts`]
-- [ ] 6.11 Add indicator display for each factor [deps: 6.10] [deliverable: `src/analyzers/display.ts`]
-- [ ] 6.12 Write tests for statistical analyzers [deps: 6.11] [deliverable: `tests/analyzers/statistical.test.ts`]
+- [x] 6.1 Implement Type-Token Ratio calculator [deps: 1.1] [deliverable: `src/analyzers/lexical-diversity.ts`]
+- [x] 6.2 Implement sentence length variation analyzer [deps: 1.1] [deliverable: `src/analyzers/sentence-length.ts`]
+- [x] 6.3 Implement passive voice detector [deps: 1.1] [deliverable: `src/analyzers/passive-voice.ts`]
+- [x] 6.4 Create transition word list [deps: 0.4] [deliverable: `src/analyzers/transition-words.ts`]
+- [x] 6.5 Implement transition word density analyzer [deps: 6.4] [deliverable: `src/analyzers/transition-density.ts`]
+- [x] 6.6 Implement Flesch-Kincaid Grade Level calculator [deps: 1.1] [deliverable: `src/analyzers/flesch-kincaid.ts`]
+- [x] 6.7 Implement punctuation pattern analyzer [deps: 1.1] [deliverable: `src/analyzers/punctuation.ts`]
+- [x] 6.8 Create rare word dictionary/frequency list [deps: 0.4] [deliverable: `src/analyzers/rare-words.ts`]
+- [x] 6.9 Implement rare word usage analyzer [deps: 6.8] [deliverable: `src/analyzers/rare-word-usage.ts`]
+- [x] 6.10 Create statistical analyzer aggregator [deps: 6.1-6.9] [deliverable: `src/analyzers/aggregator.ts`]
+- [x] 6.11 Add indicator display for each factor [deps: 6.10] [deliverable: `src/analyzers/display.ts`]
+- [x] 6.12 Write tests for statistical analyzers [deps: 6.11] [deliverable: `tests/analyzers/statistical.test.ts`]
 
 **Parallel Groups**:
 - Group A: 6.1, 6.2, 6.3, 6.4, 6.6, 6.7, 6.8 (all independent - can assign to 7 agents)

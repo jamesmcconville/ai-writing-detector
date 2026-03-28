@@ -1,5 +1,9 @@
 # Changelog
 
+## [2026-03-28] Phase 6: Statistical Analysis
+
+- Completed 12 task(s) in phase 6
+
 ## [2026-03-28] Phase 5: Promotional Language Detection
 
 - Completed 7 task(s) in phase 5

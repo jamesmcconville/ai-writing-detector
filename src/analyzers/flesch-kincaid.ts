@@ -1,5 +1,4 @@
-import { tokenizeWords } from '../utils/tokenizer.js';
-import { tokenizeSentences } from '../utils/tokenizer.js';
+import { tokenizeWords, tokenizeSentences } from '../utils/tokenizer.js';
 
 export interface FleschKincaidResult {
   gradeLevel: number;
@@ -11,13 +10,13 @@ export interface FleschKincaidResult {
 }
 
 function countSyllables(word: string): number {
-  word = word.toLowerCase();
-  if (word.length <= 3) return 1;
-  
-  word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e$)/, '');
-  word = word.replace(/y$/, 'i');
-  
-  const vowelMatches = word.match(/[aeiouy]/gi);
+  let w = word.toLowerCase();
+  if (w.length <= 3) return 1;
+
+  w = w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e$)/, '');
+  w = w.replace(/y$/, 'i');
+
+  const vowelMatches = w.match(/[aeiouy]/gi);
   return Math.max(1, vowelMatches ? vowelMatches.length : 0);
 }
 
@@ -38,11 +37,11 @@ export function calculateFleschKincaid(text: string): FleschKincaidResult {
   const wordCount = words.length;
   const sentenceCount = sentences.length || 1;
 
-  if (wordCount === 0 || sentenceCount === 0) {
+  if (wordCount === 0) {
     return {
       gradeLevel: 0,
       readingEase: 0,
-      wordCount,
+      wordCount: 0,
       sentenceCount,
       syllableCount: 0,
       interpretation: 'Insufficient text for analysis',

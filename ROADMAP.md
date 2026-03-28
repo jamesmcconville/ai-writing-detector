@@ -24,6 +24,7 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 - [x] 0.6 Prepare sample texts for testing [deps: None] [deliverable: `samples/ai-generated/`, `samples/human-written/` with 3-5 texts each]
 
 **Parallel Groups**:
+
 - Group A: 0.1, 0.2, 0.4, 0.5, 0.6 (all independent)
 - Group B: 0.3 (requires 0.1)
 
@@ -46,6 +47,7 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 - [x] 1.9 Write tests for Phase 1 [deps: 1.1-1.8] [deliverable: `tests/phase1.test.ts`]
 
 **Parallel Groups**:
+
 - Group A: 1.1, 1.2, 1.3, 1.4 (all independent)
 - Group B: 1.5, 1.6 (requires 1.4)
 - Group C: 1.7 (requires 1.5, 1.6)
@@ -67,6 +69,7 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 - [x] 2.5 Write tests for vocabulary detection [deps: 2.4] [deliverable: `tests/detectors/vocabulary.test.ts`]
 
 **Parallel Groups**:
+
 - Group A: 2.1 (independent)
 - Group B: 2.2, 2.3 (requires 2.1, can run in parallel with each other)
 - Group C: 2.4 (requires 2.2, 2.3)
@@ -89,6 +92,7 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 - [x] 3.7 Write tests for structural patterns [deps: 3.6] [deliverable: `tests/detectors/structural.test.ts`]
 
 **Parallel Groups**:
+
 - Group A: 3.1, 3.2, 3.3, 3.4 (all independent, can be assigned to 4 different agents)
 - Group B: 3.5 (requires all of Group A)
 - Group C: 3.6 (requires 3.5)
@@ -113,6 +117,7 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 - [x] 4.9 Write tests for vague claims detection [deps: 4.8] [deliverable: `tests/detectors/vague.test.ts`]
 
 **Parallel Groups**:
+
 - Group A: 4.1, 4.3, 4.5, 4.7 (all independent)
 - Group B: 4.2, 4.4, 4.6 (requires respective phrase lists, can run in parallel)
 - Group C: 4.8 (requires 4.2, 4.4, 4.6, 4.7)
@@ -135,6 +140,7 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 - [x] 5.7 Write tests for promotional language detection [deps: 5.6] [deliverable: `tests/detectors/promotional.test.ts`]
 
 **Parallel Groups**:
+
 - Group A: 5.1, 5.3, 5.5 (all independent)
 - Group B: 5.2, 5.4 (requires respective lists, can run in parallel)
 - Group C: 5.6 (requires 5.2, 5.4, 5.5)
@@ -162,6 +168,7 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 - [x] 6.12 Write tests for statistical analyzers [deps: 6.11] [deliverable: `tests/analyzers/statistical.test.ts`]
 
 **Parallel Groups**:
+
 - Group A: 6.1, 6.2, 6.3, 6.4, 6.6, 6.7, 6.8 (all independent - can assign to 7 agents)
 - Group B: 6.5, 6.9 (requires 6.4, 6.8 respectively)
 - Group C: 6.10 (requires all of Group A and B)
@@ -176,14 +183,15 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-- [ ] 7.1 Design scoring model interface [deps: 2.4, 3.6, 4.8, 5.6, 6.10] [deliverable: `src/scoring/types.ts`]
-- [ ] 7.2 Implement score aggregator [deps: 7.1] [deliverable: `src/scoring/aggregator.ts`]
-- [ ] 7.3 Implement score normalizer (cap at 100) [deps: 7.2] [deliverable: `src/scoring/normalizer.ts`]
-- [ ] 7.4 Implement classification system [deps: 7.3] [deliverable: `src/scoring/classifier.ts`]
-- [ ] 7.5 Implement color-coded output [deps: 7.4] [deliverable: `src/scoring/display.ts`]
-- [ ] 7.6 Write tests for scoring system [deps: 7.5] [deliverable: `tests/scoring/scoring.test.ts`]
+- [x] 7.1 Design scoring model interface [deps: 2.4, 3.6, 4.8, 5.6, 6.10] [deliverable: `src/scoring/types.ts`]
+- [x] 7.2 Implement score aggregator [deps: 7.1] [deliverable: `src/scoring/aggregator.ts`]
+- [x] 7.3 Implement score normalizer (cap at 100) [deps: 7.2] [deliverable: `src/scoring/normalizer.ts`]
+- [x] 7.4 Implement classification system [deps: 7.3] [deliverable: `src/scoring/classifier.ts`]
+- [x] 7.5 Implement color-coded output [deps: 7.4] [deliverable: `src/scoring/display.ts`]
+- [x] 7.6 Write tests for scoring system [deps: 7.5] [deliverable: `tests/scoring/scoring.test.ts`]
 
 **Parallel Groups**:
+
 - Sequential: 7.1 → 7.2 → 7.3 → 7.4 → 7.5 → 7.6
 
 ---
@@ -194,17 +202,18 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-- [ ] 8.1 Design report data structure [deps: 7.4] [deliverable: `src/report/types.ts`]
-- [ ] 8.2 Implement text statistics section [deps: 1.8] [deliverable: `src/report/sections/statistics.ts`]
-- [ ] 8.3 Implement linguistic factors section [deps: 6.11] [deliverable: `src/report/sections/linguistic.ts`]
-- [ ] 8.4 Implement pattern detections section [deps: 2.4, 3.6, 4.8, 5.6] [deliverable: `src/report/sections/patterns.ts`]
-- [ ] 8.5 Implement overall score section [deps: 7.5] [deliverable: `src/report/sections/score.ts`]
-- [ ] 8.6 Create report assembler [deps: 8.1-8.5] [deliverable: `src/report/assembler.ts`]
-- [ ] 8.7 Implement CLI report formatter [deps: 8.6] [deliverable: `src/report/formatters/cli.ts`]
-- [ ] 8.8 Add timestamp to reports [deps: 8.7] [deliverable: `src/report/timestamp.ts`]
-- [ ] 8.9 Write tests for report generation [deps: 8.8] [deliverable: `tests/report/report.test.ts`]
+- [x] 8.1 Design report data structure [deps: 7.4] [deliverable: `src/report/types.ts`]
+- [x] 8.2 Implement text statistics section [deps: 1.8] [deliverable: `src/report/sections/statistics.ts`]
+- [x] 8.3 Implement linguistic factors section [deps: 6.11] [deliverable: `src/report/sections/linguistic.ts`]
+- [x] 8.4 Implement pattern detections section [deps: 2.4, 3.6, 4.8, 5.6] [deliverable: `src/report/sections/patterns.ts`]
+- [x] 8.5 Implement overall score section [deps: 7.5] [deliverable: `src/report/sections/score.ts`]
+- [x] 8.6 Create report assembler [deps: 8.1-8.5] [deliverable: `src/report/assembler.ts`]
+- [x] 8.7 Implement CLI report formatter [deps: 8.6] [deliverable: `src/report/formatters/cli.ts`]
+- [x] 8.8 Add timestamp to reports [deps: 8.7] [deliverable: `src/report/timestamp.ts`]
+- [x] 8.9 Write tests for report generation [deps: 8.8] [deliverable: `tests/report/report.test.ts`]
 
 **Parallel Groups**:
+
 - Group A: 8.2, 8.3, 8.4 (independent, can run in parallel)
 - Group B: 8.1 (requires 7.4), 8.5 (requires 7.5) - can run in parallel with Group A
 - Group C: 8.6 (requires 8.1-8.5)
@@ -258,18 +267,18 @@ Phase 0 (Foundation)
 
 ### Maximum Parallelization Opportunities
 
-| Phase | Max Parallel Agents | Tasks for Parallel Execution |
-|-------|---------------------|------------------------------|
-| 0 | 5 | 0.1, 0.2, 0.4, 0.5, 0.6 |
-| 1 | 4 | 1.1, 1.2, 1.3, 1.4 |
-| 2 | 2 | 2.2, 2.3 (after 2.1) |
-| 3 | 4 | 3.1, 3.2, 3.3, 3.4 |
-| 4 | 4 | 4.1, 4.3, 4.5, 4.7 |
-| 5 | 3 | 5.1, 5.3, 5.5 |
-| 6 | 7 | 6.1, 6.2, 6.3, 6.4, 6.6, 6.7, 6.8 |
-| 7 | 1 | Sequential |
-| 8 | 5 | 8.1, 8.2, 8.3, 8.4, 8.5 |
-| 9 | 5 | 9.3, 9.4, 9.5, 9.6, 9.7 |
+| Phase | Max Parallel Agents | Tasks for Parallel Execution      |
+| ----- | ------------------- | --------------------------------- |
+| 0     | 5                   | 0.1, 0.2, 0.4, 0.5, 0.6           |
+| 1     | 4                   | 1.1, 1.2, 1.3, 1.4                |
+| 2     | 2                   | 2.2, 2.3 (after 2.1)              |
+| 3     | 4                   | 3.1, 3.2, 3.3, 3.4                |
+| 4     | 4                   | 4.1, 4.3, 4.5, 4.7                |
+| 5     | 3                   | 5.1, 5.3, 5.5                     |
+| 6     | 7                   | 6.1, 6.2, 6.3, 6.4, 6.6, 6.7, 6.8 |
+| 7     | 1                   | Sequential                        |
+| 8     | 5                   | 8.1, 8.2, 8.3, 8.4, 8.5           |
+| 9     | 5                   | 9.3, 9.4, 9.5, 9.6, 9.7           |
 
 ---
 
@@ -383,17 +392,17 @@ ai-writing-detector/
 ## Estimated Effort
 
 | Phase | Tasks | Complexity | Estimated Time |
-|-------|-------|------------|----------------|
-| 0 | 6 | Low | 2-3 hours |
-| 1 | 9 | Low | 3-4 hours |
-| 2 | 5 | Medium | 2-3 hours |
-| 3 | 7 | Medium | 4-5 hours |
-| 4 | 9 | Medium | 3-4 hours |
-| 5 | 7 | Medium | 3-4 hours |
-| 6 | 12 | High | 6-8 hours |
-| 7 | 6 | Medium | 2-3 hours |
-| 8 | 9 | Medium | 3-4 hours |
-| 9 | 9 | Variable | 4-6 hours |
+| ----- | ----- | ---------- | -------------- |
+| 0     | 6     | Low        | 2-3 hours      |
+| 1     | 9     | Low        | 3-4 hours      |
+| 2     | 5     | Medium     | 2-3 hours      |
+| 3     | 7     | Medium     | 4-5 hours      |
+| 4     | 9     | Medium     | 3-4 hours      |
+| 5     | 7     | Medium     | 3-4 hours      |
+| 6     | 12    | High       | 6-8 hours      |
+| 7     | 6     | Medium     | 2-3 hours      |
+| 8     | 9     | Medium     | 3-4 hours      |
+| 9     | 9     | Variable   | 4-6 hours      |
 
 **Total Estimated Time**: 32-44 hours (core phases 0-8)
 

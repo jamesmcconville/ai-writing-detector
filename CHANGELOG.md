@@ -1,5 +1,9 @@
 # Changelog
 
+## [2026-03-28] Phase 0 — Task 0.4
+
+- Create project directory structure
+
 ## [2026-03-28] Phase 0 — Task 0.3
 
 - Set up testing framework

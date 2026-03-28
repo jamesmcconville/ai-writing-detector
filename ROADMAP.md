@@ -16,14 +16,12 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-| ID | Task | Dependencies | Parallelizable | Deliverable |
-|----|------|--------------|----------------|-------------|
-| 0.1 | Initialize NodeJS project with `package.json` | None | Yes | `package.json` with TypeScript, testing deps |
-| 0.2 | Configure TypeScript (`tsconfig.json`) | None | Yes | `tsconfig.json` with strict mode |
-| 0.3 | Set up testing framework (Vitest or Jest) | 0.1 | No | Test config + sample passing test |
-| 0.4 | Create project directory structure | None | Yes | `src/`, `src/detectors/`, `src/analyzers/`, `src/utils/`, `tests/`, `samples/` |
-| 0.5 | Add linter/formatter (ESLint + Prettier) | None | Yes | `.eslintrc.js`, `.prettierrc` |
-| 0.6 | Prepare sample texts for testing | None | Yes | `samples/ai-generated/`, `samples/human-written/` with 3-5 texts each |
+- [x] 0.1 Initialize NodeJS project with `package.json` [deps: None] [deliverable: `package.json` with TypeScript, testing deps]
+- [ ] 0.2 Configure TypeScript (`tsconfig.json`) [deps: None] [deliverable: `tsconfig.json` with strict mode]
+- [ ] 0.3 Set up testing framework (Vitest or Jest) [deps: 0.1] [deliverable: Test config + sample passing test]
+- [ ] 0.4 Create project directory structure [deps: None] [deliverable: `src/`, `src/detectors/`, `src/analyzers/`, `src/utils/`, `tests/`, `samples/`]
+- [ ] 0.5 Add linter/formatter (ESLint + Prettier) [deps: None] [deliverable: `.eslintrc.js`, `.prettierrc`]
+- [ ] 0.6 Prepare sample texts for testing [deps: None] [deliverable: `samples/ai-generated/`, `samples/human-written/` with 3-5 texts each]
 
 **Parallel Groups**:
 - Group A: 0.1, 0.2, 0.4, 0.5, 0.6 (all independent)
@@ -37,17 +35,15 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-| ID | Task | Dependencies | Parallelizable | Deliverable |
-|----|------|--------------|----------------|-------------|
-| 1.1 | Create text tokenizer utility | 0.4 | Yes | `src/utils/tokenizer.ts` |
-| 1.2 | Implement character counter | 0.4 | Yes | `src/utils/statistics.ts` - `countCharacters()` |
-| 1.3 | Implement word counter | 0.4 | Yes | `src/utils/statistics.ts` - `countWords()` |
-| 1.4 | Create CLI entry point with argument parsing | 0.1 | Yes | `src/cli.ts` using commander or yargs |
-| 1.5 | Implement file input handler | 1.4 | No | `src/input/file.ts` |
-| 1.6 | Implement stdin input handler | 1.4 | No | `src/input/stdin.ts` |
-| 1.7 | Add empty input validation | 1.5, 1.6 | No | `src/input/validator.ts` |
-| 1.8 | Display basic statistics output | 1.2, 1.3, 1.7 | No | `src/output/display.ts` |
-| 1.9 | Write tests for Phase 1 | 1.1-1.8 | No | `tests/phase1.test.ts` |
+- [ ] 1.1 Create text tokenizer utility [deps: 0.4] [deliverable: `src/utils/tokenizer.ts`]
+- [ ] 1.2 Implement character counter [deps: 0.4] [deliverable: `src/utils/statistics.ts` - `countCharacters()`]
+- [ ] 1.3 Implement word counter [deps: 0.4] [deliverable: `src/utils/statistics.ts` - `countWords()`]
+- [ ] 1.4 Create CLI entry point with argument parsing [deps: 0.1] [deliverable: `src/cli.ts` using commander or yargs]
+- [ ] 1.5 Implement file input handler [deps: 1.4] [deliverable: `src/input/file.ts`]
+- [ ] 1.6 Implement stdin input handler [deps: 1.4] [deliverable: `src/input/stdin.ts`]
+- [ ] 1.7 Add empty input validation [deps: 1.5, 1.6] [deliverable: `src/input/validator.ts`]
+- [ ] 1.8 Display basic statistics output [deps: 1.2, 1.3, 1.7] [deliverable: `src/output/display.ts`]
+- [ ] 1.9 Write tests for Phase 1 [deps: 1.1-1.8] [deliverable: `tests/phase1.test.ts`]
 
 **Parallel Groups**:
 - Group A: 1.1, 1.2, 1.3, 1.4 (all independent)
@@ -64,13 +60,11 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-| ID | Task | Dependencies | Parallelizable | Deliverable |
-|----|------|--------------|----------------|-------------|
-| 2.1 | Create AI vocabulary word list | 0.4 | Yes | `src/detectors/vocabulary/ai-words.ts` - comprehensive term list |
-| 2.2 | Implement vocabulary scanner | 2.1 | No | `src/detectors/vocabulary/scanner.ts` |
-| 2.3 | Implement phrase detector (multi-word) | 2.1 | No | `src/detectors/vocabulary/phrase-detector.ts` |
-| 2.4 | Create vocabulary scoring system | 2.2, 2.3 | No | `src/detectors/vocabulary/scorer.ts` with max cap |
-| 2.5 | Write tests for vocabulary detection | 2.4 | No | `tests/detectors/vocabulary.test.ts` |
+- [ ] 2.1 Create AI vocabulary word list [deps: 0.4] [deliverable: `src/detectors/vocabulary/ai-words.ts` - comprehensive term list]
+- [ ] 2.2 Implement vocabulary scanner [deps: 2.1] [deliverable: `src/detectors/vocabulary/scanner.ts`]
+- [ ] 2.3 Implement phrase detector (multi-word) [deps: 2.1] [deliverable: `src/detectors/vocabulary/phrase-detector.ts`]
+- [ ] 2.4 Create vocabulary scoring system [deps: 2.2, 2.3] [deliverable: `src/detectors/vocabulary/scorer.ts` with max cap]
+- [ ] 2.5 Write tests for vocabulary detection [deps: 2.4] [deliverable: `tests/detectors/vocabulary.test.ts`]
 
 **Parallel Groups**:
 - Group A: 2.1 (independent)
@@ -86,15 +80,13 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-| ID | Task | Dependencies | Parallelizable | Deliverable |
-|----|------|--------------|----------------|-------------|
-| 3.1 | Implement "Rule of Three" detector | 1.1 | Yes | `src/detectors/structural/rule-of-three.ts` |
-| 3.2 | Implement "Negative Parallelism" detector | 1.1 | Yes | `src/detectors/structural/negative-parallelism.ts` |
-| 3.3 | Implement "Outline-style Conclusions" detector | 1.1 | Yes | `src/detectors/structural/outline-conclusions.ts` |
-| 3.4 | Implement "False Ranges" detector | 1.1 | Yes | `src/detectors/structural/false-ranges.ts` |
-| 3.5 | Create structural pattern aggregator | 3.1-3.4 | No | `src/detectors/structural/aggregator.ts` |
-| 3.6 | Implement structural scoring with caps | 3.5 | No | `src/detectors/structural/scorer.ts` |
-| 3.7 | Write tests for structural patterns | 3.6 | No | `tests/detectors/structural.test.ts` |
+- [ ] 3.1 Implement "Rule of Three" detector [deps: 1.1] [deliverable: `src/detectors/structural/rule-of-three.ts`]
+- [ ] 3.2 Implement "Negative Parallelism" detector [deps: 1.1] [deliverable: `src/detectors/structural/negative-parallelism.ts`]
+- [ ] 3.3 Implement "Outline-style Conclusions" detector [deps: 1.1] [deliverable: `src/detectors/structural/outline-conclusions.ts`]
+- [ ] 3.4 Implement "False Ranges" detector [deps: 1.1] [deliverable: `src/detectors/structural/false-ranges.ts`]
+- [ ] 3.5 Create structural pattern aggregator [deps: 3.1-3.4] [deliverable: `src/detectors/structural/aggregator.ts`]
+- [ ] 3.6 Implement structural scoring with caps [deps: 3.5] [deliverable: `src/detectors/structural/scorer.ts`]
+- [ ] 3.7 Write tests for structural patterns [deps: 3.6] [deliverable: `tests/detectors/structural.test.ts`]
 
 **Parallel Groups**:
 - Group A: 3.1, 3.2, 3.3, 3.4 (all independent, can be assigned to 4 different agents)
@@ -110,17 +102,15 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-| ID | Task | Dependencies | Parallelizable | Deliverable |
-|----|------|--------------|----------------|-------------|
-| 4.1 | Create vague attribution phrase list | 0.4 | Yes | `src/detectors/vague/attribution-phrases.ts` |
-| 4.2 | Implement vague attribution detector | 4.1 | No | `src/detectors/vague/attribution.ts` |
-| 4.3 | Create superficial analysis phrase list | 0.4 | Yes | `src/detectors/vague/superficial-phrases.ts` |
-| 4.4 | Implement superficial analysis detector | 4.3 | No | `src/detectors/vague/superficial.ts` |
-| 4.5 | Create overgeneralization phrase list | 0.4 | Yes | `src/detectors/vague/overgeneralization-phrases.ts` |
-| 4.6 | Implement overgeneralization detector | 4.5 | No | `src/detectors/vague/overgeneralization.ts` |
-| 4.7 | Implement legitimate citation whitelist | 0.4 | Yes | `src/detectors/vague/legitimate-citations.ts` |
-| 4.8 | Create vague claims aggregator with scoring | 4.2, 4.4, 4.6, 4.7 | No | `src/detectors/vague/aggregator.ts` |
-| 4.9 | Write tests for vague claims detection | 4.8 | No | `tests/detectors/vague.test.ts` |
+- [ ] 4.1 Create vague attribution phrase list [deps: 0.4] [deliverable: `src/detectors/vague/attribution-phrases.ts`]
+- [ ] 4.2 Implement vague attribution detector [deps: 4.1] [deliverable: `src/detectors/vague/attribution.ts`]
+- [ ] 4.3 Create superficial analysis phrase list [deps: 0.4] [deliverable: `src/detectors/vague/superficial-phrases.ts`]
+- [ ] 4.4 Implement superficial analysis detector [deps: 4.3] [deliverable: `src/detectors/vague/superficial.ts`]
+- [ ] 4.5 Create overgeneralization phrase list [deps: 0.4] [deliverable: `src/detectors/vague/overgeneralization-phrases.ts`]
+- [ ] 4.6 Implement overgeneralization detector [deps: 4.5] [deliverable: `src/detectors/vague/overgeneralization.ts`]
+- [ ] 4.7 Implement legitimate citation whitelist [deps: 0.4] [deliverable: `src/detectors/vague/legitimate-citations.ts`]
+- [ ] 4.8 Create vague claims aggregator with scoring [deps: 4.2, 4.4, 4.6, 4.7] [deliverable: `src/detectors/vague/aggregator.ts`]
+- [ ] 4.9 Write tests for vague claims detection [deps: 4.8] [deliverable: `tests/detectors/vague.test.ts`]
 
 **Parallel Groups**:
 - Group A: 4.1, 4.3, 4.5, 4.7 (all independent)
@@ -136,15 +126,13 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-| ID | Task | Dependencies | Parallelizable | Deliverable |
-|----|------|--------------|----------------|-------------|
-| 5.1 | Create superlatives and intensifiers list | 0.4 | Yes | `src/detectors/promotional/intensifiers.ts` |
-| 5.2 | Implement undue emphasis detector | 5.1 | No | `src/detectors/promotional/emphasis.ts` |
-| 5.3 | Create marketing phrase list | 0.4 | Yes | `src/detectors/promotional/marketing-phrases.ts` |
-| 5.4 | Implement promotional language detector | 5.3 | No | `src/detectors/promotional/promotional.ts` |
-| 5.5 | Implement elegant variation detector | 1.1 | Yes | `src/detectors/promotional/elegant-variation.ts` |
-| 5.6 | Create promotional language aggregator with scoring | 5.2, 5.4, 5.5 | No | `src/detectors/promotional/aggregator.ts` |
-| 5.7 | Write tests for promotional language detection | 5.6 | No | `tests/detectors/promotional.test.ts` |
+- [ ] 5.1 Create superlatives and intensifiers list [deps: 0.4] [deliverable: `src/detectors/promotional/intensifiers.ts`]
+- [ ] 5.2 Implement undue emphasis detector [deps: 5.1] [deliverable: `src/detectors/promotional/emphasis.ts`]
+- [ ] 5.3 Create marketing phrase list [deps: 0.4] [deliverable: `src/detectors/promotional/marketing-phrases.ts`]
+- [ ] 5.4 Implement promotional language detector [deps: 5.3] [deliverable: `src/detectors/promotional/promotional.ts`]
+- [ ] 5.5 Implement elegant variation detector [deps: 1.1] [deliverable: `src/detectors/promotional/elegant-variation.ts`]
+- [ ] 5.6 Create promotional language aggregator with scoring [deps: 5.2, 5.4, 5.5] [deliverable: `src/detectors/promotional/aggregator.ts`]
+- [ ] 5.7 Write tests for promotional language detection [deps: 5.6] [deliverable: `tests/detectors/promotional.test.ts`]
 
 **Parallel Groups**:
 - Group A: 5.1, 5.3, 5.5 (all independent)
@@ -160,20 +148,18 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-| ID | Task | Dependencies | Parallelizable | Deliverable |
-|----|------|--------------|----------------|-------------|
-| 6.1 | Implement Type-Token Ratio calculator | 1.1 | Yes | `src/analyzers/lexical-diversity.ts` |
-| 6.2 | Implement sentence length variation analyzer | 1.1 | Yes | `src/analyzers/sentence-length.ts` |
-| 6.3 | Implement passive voice detector | 1.1 | Yes | `src/analyzers/passive-voice.ts` |
-| 6.4 | Create transition word list | 0.4 | Yes | `src/analyzers/transition-words.ts` |
-| 6.5 | Implement transition word density analyzer | 6.4 | No | `src/analyzers/transition-density.ts` |
-| 6.6 | Implement Flesch-Kincaid Grade Level calculator | 1.1 | Yes | `src/analyzers/flesch-kincaid.ts` |
-| 6.7 | Implement punctuation pattern analyzer | 1.1 | Yes | `src/analyzers/punctuation.ts` |
-| 6.8 | Create rare word dictionary/frequency list | 0.4 | Yes | `src/analyzers/rare-words.ts` |
-| 6.9 | Implement rare word usage analyzer | 6.8 | No | `src/analyzers/rare-word-usage.ts` |
-| 6.10 | Create statistical analyzer aggregator | 6.1-6.9 | No | `src/analyzers/aggregator.ts` |
-| 6.11 | Add indicator display for each factor | 6.10 | No | `src/analyzers/display.ts` |
-| 6.12 | Write tests for statistical analyzers | 6.11 | No | `tests/analyzers/statistical.test.ts` |
+- [ ] 6.1 Implement Type-Token Ratio calculator [deps: 1.1] [deliverable: `src/analyzers/lexical-diversity.ts`]
+- [ ] 6.2 Implement sentence length variation analyzer [deps: 1.1] [deliverable: `src/analyzers/sentence-length.ts`]
+- [ ] 6.3 Implement passive voice detector [deps: 1.1] [deliverable: `src/analyzers/passive-voice.ts`]
+- [ ] 6.4 Create transition word list [deps: 0.4] [deliverable: `src/analyzers/transition-words.ts`]
+- [ ] 6.5 Implement transition word density analyzer [deps: 6.4] [deliverable: `src/analyzers/transition-density.ts`]
+- [ ] 6.6 Implement Flesch-Kincaid Grade Level calculator [deps: 1.1] [deliverable: `src/analyzers/flesch-kincaid.ts`]
+- [ ] 6.7 Implement punctuation pattern analyzer [deps: 1.1] [deliverable: `src/analyzers/punctuation.ts`]
+- [ ] 6.8 Create rare word dictionary/frequency list [deps: 0.4] [deliverable: `src/analyzers/rare-words.ts`]
+- [ ] 6.9 Implement rare word usage analyzer [deps: 6.8] [deliverable: `src/analyzers/rare-word-usage.ts`]
+- [ ] 6.10 Create statistical analyzer aggregator [deps: 6.1-6.9] [deliverable: `src/analyzers/aggregator.ts`]
+- [ ] 6.11 Add indicator display for each factor [deps: 6.10] [deliverable: `src/analyzers/display.ts`]
+- [ ] 6.12 Write tests for statistical analyzers [deps: 6.11] [deliverable: `tests/analyzers/statistical.test.ts`]
 
 **Parallel Groups**:
 - Group A: 6.1, 6.2, 6.3, 6.4, 6.6, 6.7, 6.8 (all independent - can assign to 7 agents)
@@ -190,14 +176,12 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-| ID | Task | Dependencies | Parallelizable | Deliverable |
-|----|------|--------------|----------------|-------------|
-| 7.1 | Design scoring model interface | 2.4, 3.6, 4.8, 5.6, 6.10 | No | `src/scoring/types.ts` |
-| 7.2 | Implement score aggregator | 7.1 | No | `src/scoring/aggregator.ts` |
-| 7.3 | Implement score normalizer (cap at 100) | 7.2 | No | `src/scoring/normalizer.ts` |
-| 7.4 | Implement classification system | 7.3 | No | `src/scoring/classifier.ts` |
-| 7.5 | Implement color-coded output | 7.4 | No | `src/scoring/display.ts` |
-| 7.6 | Write tests for scoring system | 7.5 | No | `tests/scoring/scoring.test.ts` |
+- [ ] 7.1 Design scoring model interface [deps: 2.4, 3.6, 4.8, 5.6, 6.10] [deliverable: `src/scoring/types.ts`]
+- [ ] 7.2 Implement score aggregator [deps: 7.1] [deliverable: `src/scoring/aggregator.ts`]
+- [ ] 7.3 Implement score normalizer (cap at 100) [deps: 7.2] [deliverable: `src/scoring/normalizer.ts`]
+- [ ] 7.4 Implement classification system [deps: 7.3] [deliverable: `src/scoring/classifier.ts`]
+- [ ] 7.5 Implement color-coded output [deps: 7.4] [deliverable: `src/scoring/display.ts`]
+- [ ] 7.6 Write tests for scoring system [deps: 7.5] [deliverable: `tests/scoring/scoring.test.ts`]
 
 **Parallel Groups**:
 - Sequential: 7.1 → 7.2 → 7.3 → 7.4 → 7.5 → 7.6
@@ -210,17 +194,15 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-| ID | Task | Dependencies | Parallelizable | Deliverable |
-|----|------|--------------|----------------|-------------|
-| 8.1 | Design report data structure | 7.4 | No | `src/report/types.ts` |
-| 8.2 | Implement text statistics section | 1.8 | Yes | `src/report/sections/statistics.ts` |
-| 8.3 | Implement linguistic factors section | 6.11 | Yes | `src/report/sections/linguistic.ts` |
-| 8.4 | Implement pattern detections section | 2.4, 3.6, 4.8, 5.6 | Yes | `src/report/sections/patterns.ts` |
-| 8.5 | Implement overall score section | 7.5 | No | `src/report/sections/score.ts` |
-| 8.6 | Create report assembler | 8.1-8.5 | No | `src/report/assembler.ts` |
-| 8.7 | Implement CLI report formatter | 8.6 | No | `src/report/formatters/cli.ts` |
-| 8.8 | Add timestamp to reports | 8.7 | No | `src/report/timestamp.ts` |
-| 8.9 | Write tests for report generation | 8.8 | No | `tests/report/report.test.ts` |
+- [ ] 8.1 Design report data structure [deps: 7.4] [deliverable: `src/report/types.ts`]
+- [ ] 8.2 Implement text statistics section [deps: 1.8] [deliverable: `src/report/sections/statistics.ts`]
+- [ ] 8.3 Implement linguistic factors section [deps: 6.11] [deliverable: `src/report/sections/linguistic.ts`]
+- [ ] 8.4 Implement pattern detections section [deps: 2.4, 3.6, 4.8, 5.6] [deliverable: `src/report/sections/patterns.ts`]
+- [ ] 8.5 Implement overall score section [deps: 7.5] [deliverable: `src/report/sections/score.ts`]
+- [ ] 8.6 Create report assembler [deps: 8.1-8.5] [deliverable: `src/report/assembler.ts`]
+- [ ] 8.7 Implement CLI report formatter [deps: 8.6] [deliverable: `src/report/formatters/cli.ts`]
+- [ ] 8.8 Add timestamp to reports [deps: 8.7] [deliverable: `src/report/timestamp.ts`]
+- [ ] 8.9 Write tests for report generation [deps: 8.8] [deliverable: `tests/report/report.test.ts`]
 
 **Parallel Groups**:
 - Group A: 8.2, 8.3, 8.4 (independent, can run in parallel)
@@ -236,17 +218,15 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-| ID | Task | Dependencies | Parallelizable | Deliverable |
-|----|------|--------------|----------------|-------------|
-| 9.1 | Implement text highlighting system | 8.7 | No | `src/extensions/highlighting.ts` |
-| 9.2 | Implement category badge display | 9.1 | No | `src/extensions/badges.ts` |
-| 9.3 | Implement Zipf's Law analyzer | 6.1 | Yes | `src/analyzers/zipf-law.ts` |
-| 9.4 | Implement named entity density analyzer | 1.1 | Yes | `src/analyzers/named-entities.ts` |
-| 9.5 | Implement paragraph coherence analyzer | 1.1 | Yes | `src/analyzers/coherence.ts` |
-| 9.6 | Add "Copy Results" functionality | 8.7 | Yes | `src/extensions/copy-results.ts` |
-| 9.7 | Add "Analyse Another" option | 8.7 | Yes | `src/extensions/analyse-another.ts` |
-| 9.8 | Create accuracy measurement suite | All phases | No | `tests/accuracy/` |
-| 9.9 | Implement weighting configuration | 7.4 | No | `src/config/weights.ts` |
+- [ ] 9.1 Implement text highlighting system [deps: 8.7] [deliverable: `src/extensions/highlighting.ts`]
+- [ ] 9.2 Implement category badge display [deps: 9.1] [deliverable: `src/extensions/badges.ts`]
+- [ ] 9.3 Implement Zipf's Law analyzer [deps: 6.1] [deliverable: `src/analyzers/zipf-law.ts`]
+- [ ] 9.4 Implement named entity density analyzer [deps: 1.1] [deliverable: `src/analyzers/named-entities.ts`]
+- [ ] 9.5 Implement paragraph coherence analyzer [deps: 1.1] [deliverable: `src/analyzers/coherence.ts`]
+- [ ] 9.6 Add "Copy Results" functionality [deps: 8.7] [deliverable: `src/extensions/copy-results.ts`]
+- [ ] 9.7 Add "Analyse Another" option [deps: 8.7] [deliverable: `src/extensions/analyse-another.ts`]
+- [ ] 9.8 Create accuracy measurement suite [deps: All phases] [deliverable: `tests/accuracy/`]
+- [ ] 9.9 Implement weighting configuration [deps: 7.4] [deliverable: `src/config/weights.ts`]
 
 ---
 

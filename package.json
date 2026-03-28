@@ -16,11 +16,16 @@
     "start": "node dist/cli.js"
   },
   "devDependencies": {
+    "@types/commander": "^2.12.0",
+    "@types/node": "^25.5.0",
     "@typescript-eslint/eslint-plugin": "^8.30.1",
     "@typescript-eslint/parser": "^8.30.1",
     "eslint": "^8.57.1",
     "prettier": "^3.5.3",
     "typescript": "^5.8.3",
     "vitest": "^3.1.2"
+  },
+  "dependencies": {
+    "commander": "^14.0.3"
   }
 }

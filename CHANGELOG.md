@@ -1,5 +1,9 @@
 # Changelog
 
+## [2026-03-28] Phase 1: Text Input & Basic Statistics
+
+- Completed 6 task(s) in phase 1
+
 ## [2026-03-28] Phase 1 — Task 1.3
 
 - Implement word counter

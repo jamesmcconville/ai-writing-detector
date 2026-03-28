@@ -38,12 +38,12 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 - [x] 1.1 Create text tokenizer utility [deps: 0.4] [deliverable: `src/utils/tokenizer.ts`]
 - [x] 1.2 Implement character counter [deps: 0.4] [deliverable: `src/utils/statistics.ts` - `countCharacters()`]
 - [x] 1.3 Implement word counter [deps: 0.4] [deliverable: `src/utils/statistics.ts` - `countWords()`]
-- [ ] 1.4 Create CLI entry point with argument parsing [deps: 0.1] [deliverable: `src/cli.ts` using commander or yargs]
-- [ ] 1.5 Implement file input handler [deps: 1.4] [deliverable: `src/input/file.ts`]
-- [ ] 1.6 Implement stdin input handler [deps: 1.4] [deliverable: `src/input/stdin.ts`]
-- [ ] 1.7 Add empty input validation [deps: 1.5, 1.6] [deliverable: `src/input/validator.ts`]
-- [ ] 1.8 Display basic statistics output [deps: 1.2, 1.3, 1.7] [deliverable: `src/output/display.ts`]
-- [ ] 1.9 Write tests for Phase 1 [deps: 1.1-1.8] [deliverable: `tests/phase1.test.ts`]
+- [x] 1.4 Create CLI entry point with argument parsing [deps: 0.1] [deliverable: `src/cli.ts` using commander or yargs]
+- [x] 1.5 Implement file input handler [deps: 1.4] [deliverable: `src/input/file.ts`]
+- [x] 1.6 Implement stdin input handler [deps: 1.4] [deliverable: `src/input/stdin.ts`]
+- [x] 1.7 Add empty input validation [deps: 1.5, 1.6] [deliverable: `src/input/validator.ts`]
+- [x] 1.8 Display basic statistics output [deps: 1.2, 1.3, 1.7] [deliverable: `src/output/display.ts`]
+- [x] 1.9 Write tests for Phase 1 [deps: 1.1-1.8] [deliverable: `tests/phase1.test.ts`]
 
 **Parallel Groups**:
 - Group A: 1.1, 1.2, 1.3, 1.4 (all independent)

@@ -8,13 +8,26 @@ set -euo pipefail
 # Thin utility for LLM agents to query and update ROADMAP.md state.
 # Designed to be called from within an agent-driven loop (opsx-loop).
 #
-# Subcommands:
-#   next-task    Print the next pending task (optionally for a specific phase)
-#   mark-done    Mark a task as complete in the ROADMAP
-#   check        Run quality checks (lint, typecheck, test, build)
-#   commit       Stage all changes and create an atomic commit
-#   update-docs  Update CHANGELOG.md and README.md for a completed task
-#   status       Show per-phase and overall progress summary
+# The loop operates at **phase** granularity — one openspec change per phase,
+# with all tasks in that phase handled under a single change lifecycle.
+#
+# Subcommands (phase-level):
+#   next-phase         Print the next phase that has pending tasks
+#   phase-tasks        Print ALL pending tasks for a given phase
+#   phase-change-name  Generate a consistent openspec change name for a phase
+#   phase-commit       Stage and commit all changes for a completed phase
+#   phase-update-docs  Update CHANGELOG.md and README.md for a completed phase
+#
+# Subcommands (task-level, used within a phase):
+#   next-task          Print the next pending task (optionally for a specific phase)
+#   mark-done          Mark a single task as complete in the ROADMAP
+#
+# Subcommands (general):
+#   check              Run quality checks (lint, typecheck, test, build)
+#   commit             Stage all changes and create an atomic commit
+#   update-docs        Update CHANGELOG.md and README.md for a completed task
+#   status             Show per-phase and overall progress summary
+#   change-name        Generate an openspec change name for a single task (legacy)
 # ---------------------------------------------------------------------------
 
 readonly ROADMAP_FILE="${ROADMAP_FILE:-ROADMAP.md}"
@@ -28,12 +41,263 @@ warn() { printf '[roadmap-helper] WARN: %s\n' "$*" >&2; }
 fail() { printf '[roadmap-helper] ERROR: %s\n' "$*" >&2; exit 1; }
 
 # ---------------------------------------------------------------------------
+# Subcommand: next-phase [--start N]
+#
+# Finds the first phase (scanning from --start, default 0, up to 9) that
+# has at least one unchecked task.
+#
+# Output (pipe-delimited):
+#   <phase>|<phase_title>|<pending_count>|<total_count>
+#
+# If no phases have pending tasks, prints: ROADMAP_COMPLETE
+# ---------------------------------------------------------------------------
+
+cmd_next_phase() {
+  local start_phase=0
+
+  while (( $# > 0 )); do
+    case "$1" in
+      --start)
+        [[ $# -ge 2 ]] || fail "Missing value for --start"
+        start_phase="$2"
+        shift 2
+        ;;
+      *) fail "Unknown option for next-phase: $1" ;;
+    esac
+  done
+
+  [[ -f "$ROADMAP_FILE" ]] || fail "Roadmap file not found: $ROADMAP_FILE"
+
+  ROADMAP="$ROADMAP_FILE" START="$start_phase" python3 <<'PY'
+import re, os, sys
+
+roadmap_path = os.environ["ROADMAP"]
+start = int(os.environ.get("START", "0"))
+
+with open(roadmap_path, "r", encoding="utf-8") as f:
+    text = f.read()
+    lines = text.splitlines()
+
+for phase in range(start, 10):
+    # Count pending and total tasks for this phase
+    pending = len(re.findall(
+        rf'^\s*-\s*\[ \]\s*{phase}\.\d+',
+        text, re.MULTILINE
+    ))
+    total = len(re.findall(
+        rf'^\s*-\s*\[[ xX]\]\s*{phase}\.\d+',
+        text, re.MULTILINE
+    ))
+
+    if pending == 0:
+        continue
+
+    # Extract the phase title from the header line
+    title = f"Phase {phase}"
+    header_re = re.compile(rf'^##\s+Phase\s+{phase}\b[:\s]*(.*)')
+    for line in lines:
+        m = header_re.match(line)
+        if m:
+            title = m.group(0).lstrip('#').strip()
+            break
+
+    print(f"{phase}|{title}|{pending}|{total}")
+    sys.exit(0)
+
+print("ROADMAP_COMPLETE")
+PY
+}
+
+# ---------------------------------------------------------------------------
+# Subcommand: phase-tasks --phase N
+#
+# Prints ALL pending (unchecked) tasks for the given phase.
+# Output: one line per task, pipe-delimited:
+#   <task_id>|<description>
+#
+# If no pending tasks remain for the phase, prints: PHASE_COMPLETE
+# ---------------------------------------------------------------------------
+
+cmd_phase_tasks() {
+  local phase=""
+
+  while (( $# > 0 )); do
+    case "$1" in
+      --phase)
+        [[ $# -ge 2 ]] || fail "Missing value for --phase"
+        phase="$2"
+        shift 2
+        ;;
+      *) fail "Unknown option for phase-tasks: $1" ;;
+    esac
+  done
+
+  [[ -n "$phase" ]] || fail "Usage: roadmap-helper.sh phase-tasks --phase <N>"
+  [[ -f "$ROADMAP_FILE" ]] || fail "Roadmap file not found: $ROADMAP_FILE"
+
+  ROADMAP="$ROADMAP_FILE" PHASE="$phase" python3 <<'PY'
+import re, os, sys
+
+roadmap_path = os.environ["ROADMAP"]
+phase = int(os.environ["PHASE"])
+
+with open(roadmap_path, "r", encoding="utf-8") as f:
+    lines = f.readlines()
+
+phase_header = re.compile(rf'^##\s+Phase\s+{phase}\b')
+next_header  = re.compile(r'^##\s+Phase\s+\d+\b')
+task_re      = re.compile(
+    r'^\s*-\s*\[(?P<st>[ xX])\]\s*(?P<id>'
+    + str(phase)
+    + r'\.\d+)\s*(?P<desc>.*)$'
+)
+
+found_any = False
+in_phase = False
+
+for raw in lines:
+    line = raw.rstrip('\n')
+
+    if phase_header.match(line):
+        in_phase = True
+        continue
+
+    if in_phase and next_header.match(line) and not phase_header.match(line):
+        break
+
+    if not in_phase:
+        continue
+
+    m = task_re.match(line)
+    if not m:
+        continue
+
+    # Skip already-completed tasks
+    if m.group('st').lower() == 'x':
+        continue
+
+    found_any = True
+    task_id = m.group('id')
+    desc = m.group('desc').strip()
+    print(f"{task_id}|{desc}")
+
+if not found_any:
+    print("PHASE_COMPLETE")
+PY
+}
+
+# ---------------------------------------------------------------------------
+# Subcommand: phase-change-name <phase>
+#
+# Generates a consistent kebab-case openspec change name for a phase.
+# Example: phase 2 → "roadmap-phase-2"
+# ---------------------------------------------------------------------------
+
+cmd_phase_change_name() {
+  local phase="${1:-}"
+  [[ -n "$phase" ]] || fail "Usage: roadmap-helper.sh phase-change-name <phase>"
+  echo "roadmap-phase-${phase}"
+}
+
+# ---------------------------------------------------------------------------
+# Subcommand: phase-commit <phase> [description...]
+#
+# Stages all changes (including untracked) and creates a commit scoped to an
+# entire phase.  If there are no changes, prints a message and exits 0.
+# ---------------------------------------------------------------------------
+
+cmd_phase_commit() {
+  local phase="${1:-}"
+  [[ -n "$phase" ]] || fail "Usage: roadmap-helper.sh phase-commit <phase> [description...]"
+  shift
+  local desc="$*"
+  [[ -n "$desc" ]] || desc="complete all tasks"
+
+  if git diff --quiet 2>/dev/null \
+     && git diff --cached --quiet 2>/dev/null \
+     && [[ -z "$(git ls-files --others --exclude-standard 2>/dev/null)" ]]; then
+    log "No changes to commit for phase ${phase}"
+    return 0
+  fi
+
+  git add -A
+  git commit -m "complete roadmap phase ${phase}: ${desc}"
+  log "Committed phase ${phase}: ${desc}"
+}
+
+# ---------------------------------------------------------------------------
+# Subcommand: phase-update-docs <phase> <completed_count> [description...]
+#
+# Appends a phase-level entry to CHANGELOG.md and ensures README.md
+# references the ROADMAP.
+# ---------------------------------------------------------------------------
+
+cmd_phase_update_docs() {
+  local phase="${1:-}"
+  local completed="${2:-}"
+  shift 2 2>/dev/null || true
+  local desc="$*"
+
+  [[ -n "$phase" && -n "$completed" ]] || \
+    fail "Usage: roadmap-helper.sh phase-update-docs <phase> <completed_count> [description...]"
+
+  local changelog="CHANGELOG.md"
+  if [[ ! -f "$changelog" ]]; then
+    printf '# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n' > "$changelog"
+    log "Created ${changelog}"
+  fi
+
+  local date_stamp
+  date_stamp="$(date +%Y-%m-%d)"
+
+  CLOG="$changelog" DATE="$date_stamp" PHASE="$phase" COUNT="$completed" DESC="$desc" \
+    python3 <<'PY'
+import os
+
+clog  = os.environ["CLOG"]
+date  = os.environ["DATE"]
+phase = os.environ["PHASE"]
+count = os.environ["COUNT"]
+desc  = os.environ.get("DESC", "").strip()
+
+with open(clog, "r", encoding="utf-8") as f:
+    content = f.read()
+
+title = f"Phase {phase}"
+if desc:
+    title += f": {desc}"
+
+entry = f"\n## [{date}] {title}\n\n- Completed {count} task(s) in phase {phase}\n"
+
+# Insert after the first blank line following the title
+parts = content.split("\n\n", 1)
+if len(parts) == 2:
+    new_content = parts[0] + "\n" + entry + "\n" + parts[1]
+else:
+    new_content = content + entry
+
+with open(clog, "w", encoding="utf-8") as f:
+    f.write(new_content)
+
+print(f"[roadmap-helper] Updated {clog} with phase {phase}")
+PY
+
+  # Ensure README.md references the ROADMAP for progress tracking
+  if [[ -f "README.md" ]]; then
+    if ! grep -q 'ROADMAP.md' README.md 2>/dev/null; then
+      printf '\n## Progress\n\nSee [ROADMAP.md](ROADMAP.md) for implementation status.\n' >> README.md
+      log "Added ROADMAP reference to README.md"
+    fi
+  fi
+}
+
+# ---------------------------------------------------------------------------
 # Subcommand: next-task [--phase N]
 #
-# Prints the next unchecked task. Output format (pipe-delimited):
+# Prints the next unchecked task.  Output format (pipe-delimited):
 #   <phase>|<task_id>|<description>
 #
-# If --phase is given, restricts to that phase. Otherwise scans 0-9.
+# If --phase is given, restricts to that phase.  Otherwise scans 0-9.
 # Exits 0 with output if a task is found, exits 0 with "ROADMAP_COMPLETE"
 # if no pending tasks remain.
 # ---------------------------------------------------------------------------
@@ -278,7 +542,7 @@ PY
 # ---------------------------------------------------------------------------
 # Subcommand: status [--phase N]
 #
-# Shows per-phase progress. If --phase is given, shows only that phase.
+# Shows per-phase progress.  If --phase is given, shows only that phase.
 # Output: one line per phase with counts, plus a summary total.
 # ---------------------------------------------------------------------------
 
@@ -358,8 +622,8 @@ PY
 # ---------------------------------------------------------------------------
 # Subcommand: change-name <phase> <task-id>
 #
-# Generates a consistent kebab-case change name for a task.
-# Used by the agent to derive the openspec change name.
+# Legacy: generates a per-task change name.
+# Prefer phase-change-name for the per-phase workflow.
 # ---------------------------------------------------------------------------
 
 cmd_change_name() {
@@ -367,7 +631,6 @@ cmd_change_name() {
   local task_id="${2:-}"
   [[ -n "$phase" && -n "$task_id" ]] || fail "Usage: roadmap-helper.sh change-name <phase> <task-id>"
 
-  # Convert 0.1 → 0-1
   local safe_id="${task_id//./-}"
   echo "roadmap-phase-${phase}-task-${safe_id}"
 }
@@ -380,14 +643,23 @@ show_usage() {
   cat <<'EOF'
 Usage: scripts/roadmap-helper.sh <subcommand> [args...]
 
-Subcommands:
+Phase-level subcommands (one openspec change per phase):
+  next-phase [--start N]                    Print next phase with pending tasks
+  phase-tasks --phase N                     Print ALL pending tasks for a phase
+  phase-change-name <phase>                 Generate openspec change name for a phase
+  phase-commit <phase> [description...]     Stage and commit for a completed phase
+  phase-update-docs <phase> <count> [desc]  Update CHANGELOG/README for a phase
+
+Task-level subcommands (used within a phase):
   next-task [--phase N]                     Print next pending task (phase|id|desc)
   mark-done <task-id>                       Mark task complete in ROADMAP.md
+
+General subcommands:
   check                                     Run quality checks (lint, typecheck, test, build)
-  commit <task-id> <description...>         Stage and commit all changes
-  update-docs <task-id> <phase> <desc...>   Update CHANGELOG.md and README.md
+  commit <task-id> <description...>         Stage and commit for a single task
+  update-docs <task-id> <phase> <desc...>   Update CHANGELOG/README for a single task
   status [--phase N]                        Show per-phase progress summary
-  change-name <phase> <task-id>             Generate openspec change name for a task
+  change-name <phase> <task-id>             Generate per-task change name (legacy)
 
 Environment:
   ROADMAP_FILE    Path to roadmap file (default: ROADMAP.md)
@@ -401,15 +673,20 @@ main() {
   shift
 
   case "$subcmd" in
-    next-task)    cmd_next_task "$@" ;;
-    mark-done)    cmd_mark_done "$@" ;;
-    check)        cmd_check "$@" ;;
-    commit)       cmd_commit "$@" ;;
-    update-docs)  cmd_update_docs "$@" ;;
-    status)       cmd_status "$@" ;;
-    change-name)  cmd_change_name "$@" ;;
-    --help|-h)    show_usage ;;
-    *)            fail "Unknown subcommand: $subcmd. Run with --help for usage." ;;
+    next-phase)         cmd_next_phase "$@" ;;
+    phase-tasks)        cmd_phase_tasks "$@" ;;
+    phase-change-name)  cmd_phase_change_name "$@" ;;
+    phase-commit)       cmd_phase_commit "$@" ;;
+    phase-update-docs)  cmd_phase_update_docs "$@" ;;
+    next-task)          cmd_next_task "$@" ;;
+    mark-done)          cmd_mark_done "$@" ;;
+    check)              cmd_check "$@" ;;
+    commit)             cmd_commit "$@" ;;
+    update-docs)        cmd_update_docs "$@" ;;
+    status)             cmd_status "$@" ;;
+    change-name)        cmd_change_name "$@" ;;
+    --help|-h)          show_usage ;;
+    *)                  fail "Unknown subcommand: $subcmd. Run with --help for usage." ;;
   esac
 }
 

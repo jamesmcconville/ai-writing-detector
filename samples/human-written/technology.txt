@@ -1,0 +1,11 @@
+Learning to Code: A Personal Journey
+
+I started programming about three years ago. My first language was Python, which everyone said was easy for beginners. They were right, but I still hit plenty of walls.
+
+The weird thing about coding is that you can understand the concepts perfectly well and still get completely stuck when you try to actually build something. I remember spending an entire afternoon trying to fix a bug that turned out to be a missing semicolon. A semicolon. I nearly quit right then.
+
+What helped me most was finding a community. I joined a Discord server for Python beginners and started asking questions. At first I felt stupid asking basic stuff, but everyone was helpful. One guy named Marcus spent like an hour helping me understand how APIs work. Changed how I thought about the whole thing.
+
+Now I work as a junior developer at a small startup. The pay isn't amazing but I'm learning tons. Real codebases are messy in ways tutorials never show you. There's this one function that nobody understands anymore but everyone's afraid to touch because it might break something. Classic.
+
+My advice if you're starting: build stuff. Don't just do tutorials. Even if it's something dumb like a calculator or a to-do list, actually finishing something teaches you more than starting ten projects you never complete.

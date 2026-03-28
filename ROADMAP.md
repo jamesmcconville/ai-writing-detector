@@ -21,7 +21,7 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 - [x] 0.3 Set up testing framework (Vitest or Jest) [deps: 0.1] [deliverable: Test config + sample passing test]
 - [x] 0.4 Create project directory structure [deps: None] [deliverable: `src/`, `src/detectors/`, `src/analyzers/`, `src/utils/`, `tests/`, `samples/`]
 - [x] 0.5 Add linter/formatter (ESLint + Prettier) [deps: None] [deliverable: `.eslintrc.js`, `.prettierrc`]
-- [ ] 0.6 Prepare sample texts for testing [deps: None] [deliverable: `samples/ai-generated/`, `samples/human-written/` with 3-5 texts each]
+- [x] 0.6 Prepare sample texts for testing [deps: None] [deliverable: `samples/ai-generated/`, `samples/human-written/` with 3-5 texts each]
 
 **Parallel Groups**:
 - Group A: 0.1, 0.2, 0.4, 0.5, 0.6 (all independent)

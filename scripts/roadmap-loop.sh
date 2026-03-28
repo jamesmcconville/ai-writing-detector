@@ -8,9 +8,10 @@ set -euo pipefail
 # Lightweight wrapper around the LLM-agent-driven ROADMAP automation loop.
 #
 # The actual work (writing specs, tests, and source code) is performed by an
-# LLM agent inside OpenCode using the /opsx-loop command.  This script exists
-# for convenience — it can show progress, preview pending tasks, and launch
-# the agent session.
+# LLM agent inside OpenCode using the /opsx-loop command.  Each phase gets a
+# single openspec change covering all its tasks.  This script exists for
+# convenience — it can show progress, preview pending phases/tasks, and point
+# you to the agent command.
 #
 # See LOOP.md for full architecture documentation.
 # ---------------------------------------------------------------------------
@@ -44,24 +45,25 @@ usage() {
 Usage: scripts/roadmap-loop.sh [command] [options]
 
 Convenience wrapper for the LLM-agent-driven ROADMAP loop.
+Each ROADMAP phase gets a single openspec change covering all its tasks.
 
 Commands:
   status [--phase N]      Show per-phase progress summary
   preview [--phase N]     List all pending tasks without executing anything
-  next                    Print the single next pending task
+  next                    Print the next phase that has pending tasks
   help                    Show this help text
 
 The actual implementation loop is driven by an LLM agent inside OpenCode.
-To run the full automation:
+One openspec change is created per phase (not per task). To run:
 
     1. Open an OpenCode session
     2. Type:  ${AGENT_CMD}            (all phases 0-9)
        or:    ${AGENT_CMD} 2          (single phase)
        or:    ${AGENT_CMD} 3-5        (phase range)
 
-The agent will autonomously iterate through every pending task — writing
-real specs, tests, and source code — using the opsx workflow and the
-helper script at ${HELPER}.
+The agent will autonomously iterate through every pending phase — writing
+real specs, tests, and source code for all tasks in the phase — using the
+opsx workflow and the helper script at ${HELPER}.
 
 See LOOP.md for the full architecture.
 EOF
@@ -79,23 +81,33 @@ cmd_status() {
 cmd_next() {
   require_helper
   local result
-  result="$(bash "$HELPER" next-task "$@")"
+  result="$(bash "$HELPER" next-phase "$@")"
 
   if [[ "$result" == "ROADMAP_COMPLETE" ]]; then
-    log "🎉 All ROADMAP tasks are complete!"
+    log "🎉 All ROADMAP phases are complete!"
     return 0
   fi
 
-  local phase task_id desc
-  IFS='|' read -r phase task_id desc <<< "$result"
+  local phase title pending total
+  IFS='|' read -r phase title pending total <<< "$result"
 
-  log "Next pending task:"
+  log "Next phase with pending tasks:"
   log ""
-  log "  Phase:       ${phase}"
-  log "  Task ID:     ${task_id}"
-  log "  Description: ${desc}"
+  log "  Phase:     ${phase}"
+  log "  Title:     ${title}"
+  log "  Pending:   ${pending} of ${total} task(s)"
+  log "  Change:    roadmap-phase-${phase}"
   log ""
-  log "To process this (and all subsequent tasks), run ${AGENT_CMD} in OpenCode."
+
+  # Show the pending tasks within this phase
+  log "  Pending tasks:"
+  while IFS='|' read -r task_id task_desc; do
+    [[ "$task_id" == "PHASE_COMPLETE" ]] && break
+    log "    - [ ] ${task_id} ${task_desc}"
+  done < <(bash "$HELPER" phase-tasks --phase "$phase")
+
+  log ""
+  log "To process this phase (and all subsequent), run ${AGENT_CMD} in OpenCode."
 }
 
 cmd_preview() {
@@ -205,7 +217,7 @@ main() {
     next)         cmd_next "$@" ;;
     help|--help|-h)  usage ;;
     *)
-      # If someone runs the old-style flags, redirect them
+      # Handle old-style flags gracefully
       case "$subcmd" in
         --dry-run)  cmd_preview "$@" ;;
         --phase)    cmd_preview --phase "$@" ;;

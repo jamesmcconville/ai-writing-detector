@@ -1,5 +1,9 @@
 # Changelog
 
+## [2026-03-28] Phase 0 — Task 0.6
+
+- Prepare sample texts for testing
+
 ## [2026-03-28] Phase 0 — Task 0.5
 
 - Add linter/formatter

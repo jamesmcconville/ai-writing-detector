@@ -80,13 +80,13 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-- [ ] 3.1 Implement "Rule of Three" detector [deps: 1.1] [deliverable: `src/detectors/structural/rule-of-three.ts`]
-- [ ] 3.2 Implement "Negative Parallelism" detector [deps: 1.1] [deliverable: `src/detectors/structural/negative-parallelism.ts`]
-- [ ] 3.3 Implement "Outline-style Conclusions" detector [deps: 1.1] [deliverable: `src/detectors/structural/outline-conclusions.ts`]
-- [ ] 3.4 Implement "False Ranges" detector [deps: 1.1] [deliverable: `src/detectors/structural/false-ranges.ts`]
-- [ ] 3.5 Create structural pattern aggregator [deps: 3.1-3.4] [deliverable: `src/detectors/structural/aggregator.ts`]
-- [ ] 3.6 Implement structural scoring with caps [deps: 3.5] [deliverable: `src/detectors/structural/scorer.ts`]
-- [ ] 3.7 Write tests for structural patterns [deps: 3.6] [deliverable: `tests/detectors/structural.test.ts`]
+- [x] 3.1 Implement "Rule of Three" detector [deps: 1.1] [deliverable: `src/detectors/structural/rule-of-three.ts`]
+- [x] 3.2 Implement "Negative Parallelism" detector [deps: 1.1] [deliverable: `src/detectors/structural/negative-parallelism.ts`]
+- [x] 3.3 Implement "Outline-style Conclusions" detector [deps: 1.1] [deliverable: `src/detectors/structural/outline-conclusions.ts`]
+- [x] 3.4 Implement "False Ranges" detector [deps: 1.1] [deliverable: `src/detectors/structural/false-ranges.ts`]
+- [x] 3.5 Create structural pattern aggregator [deps: 3.1-3.4] [deliverable: `src/detectors/structural/aggregator.ts`]
+- [x] 3.6 Implement structural scoring with caps [deps: 3.5] [deliverable: `src/detectors/structural/scorer.ts`]
+- [x] 3.7 Write tests for structural patterns [deps: 3.6] [deliverable: `tests/detectors/structural.test.ts`]
 
 **Parallel Groups**:
 - Group A: 3.1, 3.2, 3.3, 3.4 (all independent, can be assigned to 4 different agents)

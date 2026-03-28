@@ -126,13 +126,13 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-- [ ] 5.1 Create superlatives and intensifiers list [deps: 0.4] [deliverable: `src/detectors/promotional/intensifiers.ts`]
-- [ ] 5.2 Implement undue emphasis detector [deps: 5.1] [deliverable: `src/detectors/promotional/emphasis.ts`]
-- [ ] 5.3 Create marketing phrase list [deps: 0.4] [deliverable: `src/detectors/promotional/marketing-phrases.ts`]
-- [ ] 5.4 Implement promotional language detector [deps: 5.3] [deliverable: `src/detectors/promotional/promotional.ts`]
-- [ ] 5.5 Implement elegant variation detector [deps: 1.1] [deliverable: `src/detectors/promotional/elegant-variation.ts`]
-- [ ] 5.6 Create promotional language aggregator with scoring [deps: 5.2, 5.4, 5.5] [deliverable: `src/detectors/promotional/aggregator.ts`]
-- [ ] 5.7 Write tests for promotional language detection [deps: 5.6] [deliverable: `tests/detectors/promotional.test.ts`]
+- [x] 5.1 Create superlatives and intensifiers list [deps: 0.4] [deliverable: `src/detectors/promotional/intensifiers.ts`]
+- [x] 5.2 Implement undue emphasis detector [deps: 5.1] [deliverable: `src/detectors/promotional/emphasis.ts`]
+- [x] 5.3 Create marketing phrase list [deps: 0.4] [deliverable: `src/detectors/promotional/marketing-phrases.ts`]
+- [x] 5.4 Implement promotional language detector [deps: 5.3] [deliverable: `src/detectors/promotional/promotional.ts`]
+- [x] 5.5 Implement elegant variation detector [deps: 1.1] [deliverable: `src/detectors/promotional/elegant-variation.ts`]
+- [x] 5.6 Create promotional language aggregator with scoring [deps: 5.2, 5.4, 5.5] [deliverable: `src/detectors/promotional/aggregator.ts`]
+- [x] 5.7 Write tests for promotional language detection [deps: 5.6] [deliverable: `tests/detectors/promotional.test.ts`]
 
 **Parallel Groups**:
 - Group A: 5.1, 5.3, 5.5 (all independent)

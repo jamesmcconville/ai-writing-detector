@@ -1,5 +1,9 @@
 # Changelog
 
+## [2026-03-28] Phase 5: Promotional Language Detection
+
+- Completed 7 task(s) in phase 5
+
 ## [2026-03-28] Phase 4: Vague Claims Detection
 
 - Completed 9 task(s) in phase 4

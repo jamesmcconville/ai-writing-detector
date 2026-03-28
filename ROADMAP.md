@@ -17,7 +17,7 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 ### Tasks
 
 - [x] 0.1 Initialize NodeJS project with `package.json` [deps: None] [deliverable: `package.json` with TypeScript, testing deps]
-- [ ] 0.2 Configure TypeScript (`tsconfig.json`) [deps: None] [deliverable: `tsconfig.json` with strict mode]
+- [x] 0.2 Configure TypeScript (`tsconfig.json`) [deps: None] [deliverable: `tsconfig.json` with strict mode]
 - [ ] 0.3 Set up testing framework (Vitest or Jest) [deps: 0.1] [deliverable: Test config + sample passing test]
 - [ ] 0.4 Create project directory structure [deps: None] [deliverable: `src/`, `src/detectors/`, `src/analyzers/`, `src/utils/`, `tests/`, `samples/`]
 - [ ] 0.5 Add linter/formatter (ESLint + Prettier) [deps: None] [deliverable: `.eslintrc.js`, `.prettierrc`]

@@ -1,5 +1,9 @@
 # Changelog
 
+## [2026-03-28] Phase 1 — Task 1.3
+
+- Implement word counter
+
 ## [2026-03-28] Phase 1 — Task 1.2
 
 - Implement character counter

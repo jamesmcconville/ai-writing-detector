@@ -37,7 +37,7 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 - [x] 1.1 Create text tokenizer utility [deps: 0.4] [deliverable: `src/utils/tokenizer.ts`]
 - [x] 1.2 Implement character counter [deps: 0.4] [deliverable: `src/utils/statistics.ts` - `countCharacters()`]
-- [ ] 1.3 Implement word counter [deps: 0.4] [deliverable: `src/utils/statistics.ts` - `countWords()`]
+- [x] 1.3 Implement word counter [deps: 0.4] [deliverable: `src/utils/statistics.ts` - `countWords()`]
 - [ ] 1.4 Create CLI entry point with argument parsing [deps: 0.1] [deliverable: `src/cli.ts` using commander or yargs]
 - [ ] 1.5 Implement file input handler [deps: 1.4] [deliverable: `src/input/file.ts`]
 - [ ] 1.6 Implement stdin input handler [deps: 1.4] [deliverable: `src/input/stdin.ts`]

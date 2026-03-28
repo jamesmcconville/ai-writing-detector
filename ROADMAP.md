@@ -102,15 +102,15 @@ This roadmap breaks down the REQUIREMENTS.md into atomic, self-contained tasks t
 
 ### Tasks
 
-- [ ] 4.1 Create vague attribution phrase list [deps: 0.4] [deliverable: `src/detectors/vague/attribution-phrases.ts`]
-- [ ] 4.2 Implement vague attribution detector [deps: 4.1] [deliverable: `src/detectors/vague/attribution.ts`]
-- [ ] 4.3 Create superficial analysis phrase list [deps: 0.4] [deliverable: `src/detectors/vague/superficial-phrases.ts`]
-- [ ] 4.4 Implement superficial analysis detector [deps: 4.3] [deliverable: `src/detectors/vague/superficial.ts`]
-- [ ] 4.5 Create overgeneralization phrase list [deps: 0.4] [deliverable: `src/detectors/vague/overgeneralization-phrases.ts`]
-- [ ] 4.6 Implement overgeneralization detector [deps: 4.5] [deliverable: `src/detectors/vague/overgeneralization.ts`]
-- [ ] 4.7 Implement legitimate citation whitelist [deps: 0.4] [deliverable: `src/detectors/vague/legitimate-citations.ts`]
-- [ ] 4.8 Create vague claims aggregator with scoring [deps: 4.2, 4.4, 4.6, 4.7] [deliverable: `src/detectors/vague/aggregator.ts`]
-- [ ] 4.9 Write tests for vague claims detection [deps: 4.8] [deliverable: `tests/detectors/vague.test.ts`]
+- [x] 4.1 Create vague attribution phrase list [deps: 0.4] [deliverable: `src/detectors/vague/attribution-phrases.ts`]
+- [x] 4.2 Implement vague attribution detector [deps: 4.1] [deliverable: `src/detectors/vague/attribution.ts`]
+- [x] 4.3 Create superficial analysis phrase list [deps: 0.4] [deliverable: `src/detectors/vague/superficial-phrases.ts`]
+- [x] 4.4 Implement superficial analysis detector [deps: 4.3] [deliverable: `src/detectors/vague/superficial.ts`]
+- [x] 4.5 Create overgeneralization phrase list [deps: 0.4] [deliverable: `src/detectors/vague/overgeneralization-phrases.ts`]
+- [x] 4.6 Implement overgeneralization detector [deps: 4.5] [deliverable: `src/detectors/vague/overgeneralization.ts`]
+- [x] 4.7 Implement legitimate citation whitelist [deps: 0.4] [deliverable: `src/detectors/vague/legitimate-citations.ts`]
+- [x] 4.8 Create vague claims aggregator with scoring [deps: 4.2, 4.4, 4.6, 4.7] [deliverable: `src/detectors/vague/aggregator.ts`]
+- [x] 4.9 Write tests for vague claims detection [deps: 4.8] [deliverable: `tests/detectors/vague.test.ts`]
 
 **Parallel Groups**:
 - Group A: 4.1, 4.3, 4.5, 4.7 (all independent)

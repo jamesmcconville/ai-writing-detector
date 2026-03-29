@@ -36,6 +36,8 @@ See [ROADMAP.md](ROADMAP.md) for implementation status and
 This repository was built with a custom agent loop documented in
 [LOOP.md](LOOP.md).
 
+![Agent Loop Diagram](agent-loop-diagram.png)
+
 The important part is that the loop is agent-driven, not a static shell script:
 
 - An LLM agent running in OpenCode executes `/opsx-loop`

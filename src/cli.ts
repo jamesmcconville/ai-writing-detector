@@ -3,6 +3,7 @@ import { readFileInput } from '@/input/file.js';
 import { readStdinInput } from '@/input/stdin.js';
 import { validateInput } from '@/input/validator.js';
 import { displayStatistics } from '@/output/display.js';
+import { computeScore, displaySummary } from '@/scoring/index.js';
 
 const program = new Command();
 
@@ -21,6 +22,9 @@ program
 
       validateInput(text);
       displayStatistics(text);
+      
+      const result = computeScore(text);
+      console.log(displaySummary(result));
     } catch (error) {
       if (error instanceof Error) {
         console.error(`Error: ${error.message}`);

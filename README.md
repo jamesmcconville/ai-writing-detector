@@ -1,5 +1,7 @@
 # AI Writing Detector
 
+![CLI Screenshot](screenshot.png)
+
 `ai-writing-detector` is a TypeScript/Node.js CLI for analyzing prose with a
 rule-based AI-writing heuristic. It looks for vocabulary, structural patterns,
 vague claims, promotional language, and several statistical signals that are
@@ -101,6 +103,7 @@ Then run the CLI against a file:
 ```bash
 npm run start -- analyze samples/human-written/technology.txt
 ```
+
 
 Or pass text on stdin:
 

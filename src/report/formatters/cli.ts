@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import chalk, { type ChalkInstance } from 'chalk';
 import type { Report } from '../types.js';
 
 const BOX_TOP_LEFT = '╔';
@@ -21,7 +21,7 @@ function centerText(text: string): string {
   return ' '.repeat(padding) + text;
 }
 
-function getScoreColor(score: number): chalk.Chalk {
+function getScoreColor(score: number): ChalkInstance {
   if (score < 30) return chalk.green;
   if (score < 60) return chalk.yellow;
   return chalk.red;

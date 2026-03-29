@@ -1,7 +1,7 @@
-import chalk from 'chalk';
+import chalk, { type ChalkInstance } from 'chalk';
 import type { ScoreContributor, ScoringResult, ClassificationResult } from './types.js';
 
-function getScoreColor(score: number): chalk.Chalk {
+function getScoreColor(score: number): ChalkInstance {
   if (score < 30) return chalk.green;
   if (score < 60) return chalk.yellow;
   return chalk.red;

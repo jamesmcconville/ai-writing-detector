@@ -1,238 +1,81 @@
 # AI Writing Detector - Agent Guidelines
 
-This document provides essential context for AI coding agents working in this repository.
+TypeScript/Node.js CLI that detects AI-generated writing via rule-based text analysis. Heuristic scoring, not model inference.
 
-## Project Overview
-
-A **TypeScript/NodeJS CLI tool** that detects AI-generated writing using rule-based text analysis. The system analyzes text across multiple dimensions—vocabulary, sentence structure, rhetorical patterns, and statistical properties—to produce a detailed report showing the likelihood the text was AI-generated.
-
-## Build, Test, and Lint Commands
+## Commands
 
 ```bash
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-
-# Run all tests
-npm test
-
-# Run a single test file
-npm test -- src/detectors/vocabulary.test.ts
-npm test -- --grep "rule of three"
-
-# Run tests in watch mode
-npm run test:watch
-
-# Lint code
-npm run lint
-
-# Fix lint errors
-npm run lint:fix
-
-# Format code
-npm run format
-
-# Type check
-npm run typecheck
-
-# Run the CLI
-npm run start -- analyze samples/test.txt
-npm run start -- analyze --stdin < input.txt
+npm install            # deps
+npm run build          # tsc + tsc-alias (must run before CLI)
+npm run start -- analyze <file>          # analyze a file
+npm run start -- analyze <file> --stdin  # analyze from stdin
+npm test               # vitest run
+npm test -- --grep "rule of three"       # focused test
+npm run test:watch     # vitest watch
+npm run lint && npm run typecheck && npm test  # verify order
+npm run lint:fix       # auto-fix
+npm run format         # prettier --write
 ```
 
-## Code Style Guidelines
+## Key Quirks
 
-### Imports
+- **ESM** (`"type": "module"` in package.json) — use `.js` extensions in imports even for `.ts` sources.
+- **`tsc-alias`** resolves `@/*` path aliases in compiled output. If you add a new `@/` import, it just works after build.
+- **Build before run** — `npm run start` executes `dist/cli.js`, so `npm run build` must succeed first.
+- **Vitest globals enabled** — `describe`, `it`, `expect` are available without imports.
+- **Tests live in `tests/`** (not `test/`), mirroring `src/` structure: `src/detectors/vocabulary/scanner.ts` → `tests/detectors/vocabulary/scanner.test.ts`.
 
-```typescript
-// Node built-ins first
-import fs from 'fs';
-import path from 'path';
-
-// External dependencies second
-import { Command } from 'commander';
-import chalk from 'chalk';
-
-// Internal modules last (use alias paths)
-import { tokenize } from '@/utils/tokenizer';
-import { countWords } from '@/utils/statistics';
-import { VocabularyScorer } from '@/detectors/vocabulary/scorer';
-```
-
-### Naming Conventions
-
-| Element           | Convention                          | Example                                    |
-| ----------------- | ----------------------------------- | ------------------------------------------ |
-| Files (utilities) | kebab-case                          | `tokenize-text.ts`, `count-words.ts`       |
-| Files (classes)   | PascalCase                          | `VocabularyScorer.ts`                      |
-| Classes           | PascalCase                          | `PatternDetector`, `ScoreAggregator`       |
-| Functions         | camelCase                           | `countCharacters()`, `detectRuleOfThree()` |
-| Constants         | SCREAMING_SNAKE                     | `MAX_VOCABULARY_SCORE`, `AI_WORD_LIST`     |
-| Interfaces        | PascalCase with I prefix (optional) | `DetectorResult`, `AnalysisReport`         |
-| Types             | PascalCase                          | `ScoreCategory`, `PatternMatch`            |
-
-### TypeScript Guidelines
-
-```typescript
-// Prefer explicit types for function parameters and returns
-export function countWords(text: string): number {
-  return tokenize(text).length;
-}
-
-// Use interfaces for object shapes
-interface DetectionResult {
-  readonly pattern: string;
-  readonly matches: readonly PatternMatch[];
-  readonly score: number;
-  readonly maxScore: number;
-}
-
-// Use const assertions for readonly arrays
-const AI_VOCABULARY = ['delve', 'navigate', 'robust'] as const;
-
-// Avoid any - use unknown when type is uncertain
-function parseInput(data: unknown): string {
-  if (typeof data !== 'string') {
-    throw new TypeError('Expected string input');
-  }
-  return data;
-}
-
-// Use optional chaining and nullish coalescing
-const wordCount = text?.trim()?.length ?? 0;
-```
-
-### Error Handling
-
-```typescript
-// Create custom error classes for domain errors
-class EmptyInputError extends Error {
-  constructor(message = 'Input text cannot be empty') {
-    super(message);
-    this.name = 'EmptyInputError';
-  }
-}
-
-class AnalysisError extends Error {
-  constructor(
-    message: string,
-    public readonly cause?: Error,
-  ) {
-    super(message);
-    this.name = 'AnalysisError';
-  }
-}
-
-// Throw early, handle at boundaries
-function analyzeText(text: string): AnalysisReport {
-  const trimmed = text.trim();
-  if (trimmed.length === 0) {
-    throw new EmptyInputError();
-  }
-  // ... analysis logic
-}
-
-// Result objects for recoverable failures
-type Result<T, E = Error> = { success: true; value: T } | { success: false; error: E };
-```
-
-### File Structure
+## Architecture
 
 ```
 src/
-├── cli.ts                 # CLI entry point
-├── input/                 # Input handling (file, stdin)
-├── utils/                 # Shared utilities (tokenizer, statistics)
-├── detectors/             # Pattern detectors by category
-│   ├── vocabulary/
-│   ├── structural/
-│   ├── vague/
-│   └── promotional/
-├── analyzers/             # Statistical analyzers
-├── scoring/               # Score aggregation and classification
-└── report/                # Report generation
+├── cli.ts                 # entry: `analyze <file> [--stdin]`
+├── input/                 # file, stdin, validator
+├── utils/                 # tokenizer, statistics
+├── detectors/             # rule-based pattern detectors
+│   ├── vocabulary/        # AI-typical words & phrases
+│   ├── structural/        # rule-of-three, negative parallelism, outline conclusions, false ranges
+│   ├── vague/             # attribution, superficial, overgeneralization
+│   └── promotional/       # intensifiers, marketing phrases, elegant variation
+├── analyzers/             # statistical: lexical diversity, sentence length, passive voice, transitions, Flesch-Kincaid, punctuation, rare words
+├── scoring/               # aggregation, normalization, classification, display
+├── report/                # report assembly, sections, CLI formatter, timestamp
+└── output/                # console display helpers
 ```
 
-### Scoring Conventions
+The CLI wires the full pipeline: statistics → scoring → report summary. Classification thresholds: `<30` = Likely Human, `30-59` = Possibly AI, `60+` = Likely AI.
 
-Each detector must:
+## Scoring Conventions
 
-1. Return a score between 0 and its maximum cap
-2. Document the maximum cap in a constant
-3. Provide explanatory text for why points were awarded
+Every detector scorer must:
+1. Return a score between 0 and its documented max cap
+2. Export the cap as a `const MAX_*_SCORE = N`
+3. Return an explanation string for why points were awarded
 
-```typescript
-const MAX_VOCABULARY_SCORE = 15;
-const POINTS_PER_AI_TERM = 3;
+## Development Loop
 
-function scoreVocabulary(matches: string[]): ScoreResult {
-  const distinctMatches = new Set(matches);
-  const rawScore = distinctMatches.size * POINTS_PER_AI_TERM;
-  const score = Math.min(rawScore, MAX_VOCABULARY_SCORE);
+This repo was built with an agent-driven loop (`LOOP.md`). Use `/opsx-loop` to continue phased development from `ROADMAP.md`. Phases 0–8 are complete; Phase 9 (Extensions) is remaining.
 
-  return {
-    category: 'vocabulary',
-    matches: Array.from(distinctMatches),
-    score,
-    maxScore: MAX_VOCABULARY_SCORE,
-    explanation: `Found ${distinctMatches.size} AI-typical terms`,
-  };
-}
-```
+`openspec/` contains spec artifacts from completed phases. `openspec/changes/archive/` holds archived changes.
 
-## Testing Guidelines
+## Style
 
-```typescript
-// Test file location mirrors src structure
-// src/detectors/vocabulary/scanner.ts -> tests/detectors/vocabulary/scanner.test.ts
-
-import { describe, it, expect } from 'vitest';
-import { scanForVocabulary } from '@/detectors/vocabulary/scanner';
-
-describe('VocabularyScanner', () => {
-  it('should detect AI vocabulary terms', () => {
-    const text = 'Let us delve into this robust ecosystem.';
-    const result = scanForVocabulary(text);
-
-    expect(result.matches).toContain('delve');
-    expect(result.matches).toContain('robust');
-    expect(result.matches).toContain('ecosystem');
-  });
-
-  it('should respect scoring cap', () => {
-    const saturatedText = 'delve navigate robust ecosystem leverage...';
-    const result = scanForVocabulary(saturatedText);
-
-    expect(result.score).toBeLessThanOrEqual(MAX_VOCABULARY_SCORE);
-  });
-
-  it('should handle empty input gracefully', () => {
-    expect(() => scanForVocabulary('')).not.toThrow();
-    expect(scanForVocabulary('').matches).toEqual([]);
-  });
-});
-```
-
-## Key Domain Concepts
-
-- **Pattern Detectors**: Match specific AI-writing patterns (vocabulary, structural, vague claims, promotional)
-- **Statistical Analyzers**: Calculate linguistic metrics (lexical diversity, sentence length variation, etc.)
-- **Score Aggregation**: Combines all detector scores into 0-100 probability
-- **Classification Thresholds**: <30 = Likely Human, 30-59 = Possibly AI, 60+ = Likely AI
+- Prettier: `singleQuote: true`, `trailingComma: "all"`, `printWidth: 100`
+- ESLint: `@typescript-eslint/recommended` + `eslint:recommended`
+- Imports: Node built-ins → external deps → internal `@/` modules
+- Files: kebab-case for utilities, PascalCase for classes
+- No `as any`, `@ts-ignore`, or `@ts-expect-error`
 
 ## Guardrails
 
-- **Never suppress type errors** with `as any`, `@ts-ignore`, or `@ts-expect-error`
-- **Never commit** unless explicitly requested
-- **Fix minimally** when debugging—don't refactor while fixing
-- **Test edge cases**: empty input, very short text, special characters
-- **Document scoring caps**: Every scorer must have a documented maximum
-- **Handle failures gracefully**: Empty input should prevent analysis, not crash
+- Never commit unless explicitly requested
+- Fix minimally when debugging — don't refactor while fixing
+- Test edge cases: empty input, very short text, special characters
+- Handle failures gracefully — empty input should prevent analysis, not crash
 
 ## References
 
-- Full requirements: `REQUIREMENTS.md`
-- Implementation roadmap: `ROADMAP.md`
-- Sample texts: `samples/ai-generated/` and `samples/human-written/`
+- `ROADMAP.md` — implementation phases and dependency graph
+- `REQUIREMENTS.md` — original challenge brief
+- `LOOP.md` — agent development loop documentation
+- `samples/ai-generated/` and `samples/human-written/` — test texts

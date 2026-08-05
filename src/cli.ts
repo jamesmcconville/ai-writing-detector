@@ -3,7 +3,8 @@ import { readFileInput } from '@/input/file.js';
 import { readStdinInput } from '@/input/stdin.js';
 import { validateInput } from '@/input/validator.js';
 import { displayStatistics } from '@/output/display.js';
-import { computeScore, displaySummary } from '@/scoring/index.js';
+import { computeScore } from '@/scoring/index.js';
+import { displaySummary } from '@/scoring/display.js';
 
 const program = new Command();
 

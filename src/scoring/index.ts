@@ -1,5 +1,4 @@
-import type { ScoringResult, AggregatedScore, ClassificationResult } from './types.js';
-import { MAX_RAW_SCORE } from './types.js';
+import type { ScoringResult } from './types.js';
 import { aggregateScores } from './aggregator.js';
 import { normalizeScore } from './normalizer.js';
 import { classifyScore } from './classifier.js';
@@ -22,4 +21,3 @@ export * from './types.js';
 export * from './aggregator.js';
 export * from './normalizer.js';
 export * from './classifier.js';
-export * from './display.js';

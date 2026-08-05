@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import {
   generateReport,
-  formatReport,
   buildStatisticsSection,
   buildLinguisticSection,
   buildPatternsSection,
   buildScoreSection,
   generateTimestamp,
 } from '../../src/report/index.js';
+import { formatReport } from '../../src/report/formatters/cli.js';
 import { aggregateStatistics } from '../../src/analyzers/aggregator.js';
 import { computeScore } from '../../src/scoring/index.js';
 

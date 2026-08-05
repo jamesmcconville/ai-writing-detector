@@ -4,12 +4,11 @@ import {
   normalizeScore,
   classifyScore,
   computeScore,
-  displayScore,
-  displaySummary,
   MAX_RAW_SCORE,
   HUMAN_THRESHOLD,
   AI_THRESHOLD,
 } from '../../src/scoring/index.js';
+import { displayScore, displaySummary } from '../../src/scoring/display.js';
 
 describe('Score Aggregator', () => {
   it('should return zero scores for empty text', () => {

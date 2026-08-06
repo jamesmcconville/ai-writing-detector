@@ -5,7 +5,6 @@
 
   let text = '';
   let isDragging = false;
-  let fileInput: HTMLInputElement | null = null;
 
   $: trimmedText = text.trim();
   $: characterCount = text.length;
@@ -13,16 +12,12 @@
   $: canAnalyze = trimmedText.length > 0;
 
   function readFile(file: File) {
-    if (!file) {
-      return;
-    }
-
     const reader = new FileReader();
     reader.onload = () => {
       text = String(reader.result ?? '');
     };
     reader.onerror = () => {
-      alert('Failed to read the file. Please try again.');
+      alert('Could not read that file. Please try again.');
     };
     reader.readAsText(file);
   }
@@ -30,19 +25,14 @@
   function handleFileInput(event: Event) {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
-    if (file) {
-      readFile(file);
-    }
+    if (file) readFile(file);
   }
 
   function handleDrop(event: DragEvent) {
     event.preventDefault();
     isDragging = false;
-
     const file = event.dataTransfer?.files[0];
-    if (file) {
-      readFile(file);
-    }
+    if (file) readFile(file);
   }
 
   function handleDragOver(event: DragEvent) {
@@ -55,79 +45,75 @@
   }
 
   function handleAnalyze() {
-    if (canAnalyze) {
-      dispatch('analyze', text);
-    }
+    if (canAnalyze) dispatch('analyze', text);
   }
 </script>
 
-<div class="text-input">
-  <label for="text-input">Paste text to analyze</label>
+<div class="input-area">
   <textarea
-    id="text-input"
     class="textarea"
     class:dragging={isDragging}
     bind:value={text}
     on:dragover={handleDragOver}
     on:dragleave={handleDragLeave}
     on:drop={handleDrop}
-    placeholder="Paste your text here, or drag and drop a .txt or .md file…"
-    aria-describedby="text-stats"
-  />
+    placeholder="Paste text here, or drop a .txt or .md file…"
+    aria-label="Text to analyze"
+  ></textarea>
 
   <div class="toolbar">
-    <div class="stats" id="text-stats">
-      <span>{characterCount} characters</span>
-      <span>{wordCount} words</span>
-    </div>
+    <span class="stats">{characterCount} characters · {wordCount} words</span>
 
     <div class="actions">
       <input
-        bind:this={fileInput}
         type="file"
         accept=".txt,.md"
         on:change={handleFileInput}
         class="visually-hidden"
         id="file-upload"
       />
-      <label for="file-upload" class="file-button">Upload File</label>
-      <button on:click={handleAnalyze} disabled={!canAnalyze}>Analyze</button>
+      <label for="file-upload" class="btn-secondary">Upload file</label>
+      <button class="btn-primary" on:click={handleAnalyze} disabled={!canAnalyze}>
+        Analyze
+      </button>
     </div>
   </div>
 </div>
 
 <style>
-  .text-input {
+  .input-area {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  label[for='text-input'] {
-    font-weight: 600;
+    gap: 1rem;
   }
 
   .textarea {
     width: 100%;
-    min-height: 300px;
-    padding: 0.75rem;
-    font-size: 1rem;
+    min-height: 240px;
+    padding: 1rem;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
     line-height: 1.6;
-    border: 2px solid #e2e8f0;
-    border-radius: 0.5rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     resize: vertical;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: border-color 0.15s ease;
+  }
+
+  .textarea::placeholder {
+    color: var(--text-tertiary);
   }
 
   .textarea:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    border-color: var(--accent);
   }
 
   .textarea.dragging {
-    border-color: #3b82f6;
-    background-color: #eff6ff;
+    border-color: var(--accent);
+    background: rgba(99, 102, 241, 0.05);
   }
 
   .toolbar {
@@ -139,40 +125,72 @@
   }
 
   .stats {
-    display: flex;
-    gap: 1rem;
-    color: #4b5563;
-    font-size: 0.875rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
   }
 
   .actions {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.625rem;
     align-items: center;
   }
 
-  .file-button {
-    display: inline-block;
-    padding: 0.625rem 1.25rem;
-    font-size: 1rem;
-    font-weight: 500;
-    border-radius: 0.375rem;
-    background-color: #f1f5f9;
-    color: #1e293b;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-  }
-
-  .file-button:hover {
-    background-color: #e2e8f0;
-  }
-
-  button {
-    background-color: #2563eb;
+  .btn-primary {
+    background: var(--accent);
     color: #ffffff;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 1.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
   }
 
-  button:hover:not(:disabled) {
-    background-color: #1d4ed8;
+  .btn-primary:hover:not(:disabled) {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--border-hover);
+    color: var(--text);
+  }
+
+  @media (max-width: 480px) {
+    .toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .actions {
+      justify-content: stretch;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      flex: 1;
+      text-align: center;
+    }
   }
 </style>

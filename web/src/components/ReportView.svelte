@@ -1,350 +1,607 @@
 <script lang="ts">
   import type { Report } from '@/report/types.js';
+  import { onMount } from 'svelte';
 
   export let report: Report;
 
+  let gaugeValue = 0;
+
+  onMount(() => {
+    setTimeout(() => {
+      gaugeValue = report.score.score;
+    }, 50);
+  });
+
   $: score = report.score.score;
-  $: scoreColor = score < 30 ? 'var(--score-green)' : score < 60 ? 'var(--score-amber)' : 'var(--score-red)';
-  $: scoreLabel = score < 30 ? 'Likely Human' : score < 60 ? 'Possibly AI' : 'Likely AI';
+  $: statusColor =
+    score < 30 ? 'var(--status-green)' : score < 60 ? 'var(--status-amber)' : 'var(--status-red)';
+  $: statusBg =
+    score < 30
+      ? 'var(--status-green-bg)'
+      : score < 60
+        ? 'var(--status-amber-bg)'
+        : 'var(--status-red-bg)';
+  $: statusLabel = score < 30 ? 'Likely Human' : score < 60 ? 'Possibly AI' : 'Likely AI';
   $: activeCategories = report.patterns.categories.filter(
-    (category) => category.matchCount > 0 || category.score > 0,
+    (c) => c.matchCount > 0 || c.score > 0,
   );
   $: sortedContributions = [...report.contributions].sort((a, b) => b.score - a.score);
+
+  // Gauge geometry — semicircle, 0 at left, 100 at right
+  $: gaugeAngle = (gaugeValue / 100) * 180;
+  $: gaugeRadians = (gaugeAngle * Math.PI) / 180;
+  $: gaugeRadius = 80;
+  $: gaugeCx = 90;
+  $: gaugeCy = 90;
+  // Arc path from left (180°) to the current angle
+  $: arcEndX = gaugeCx + gaugeRadius * Math.cos(Math.PI - gaugeRadians);
+  $: arcEndY = gaugeCy - gaugeRadius * Math.sin(gaugeRadians);
+  $: largeArc = gaugeAngle > 180 ? 1 : 0;
+  $: arcPath = `M ${gaugeCx - gaugeRadius} ${gaugeCy} A ${gaugeRadius} ${gaugeRadius} 0 ${largeArc} 1 ${arcEndX} ${arcEndY}`;
+
+  function fmt(n: number): string {
+    return n.toLocaleString('en-US');
+  }
+
+  function fmtDec(n: number, places: number = 2): string {
+    return n.toFixed(places);
+  }
+
+  function pct(n: number, total: number): string {
+    return total > 0 ? Math.round((n / total) * 100) + '%' : '0%';
+  }
 </script>
 
-<div class="report">
-  <details class="section" open>
-    <summary>Score</summary>
-    <div class="score-section">
-      <div class="score-value" style="color: {scoreColor}">{score}</div>
-      <div class="score-label" style="color: {scoreColor}">{scoreLabel}</div>
-      <div class="classification">Classification: {report.score.classification}</div>
-      <p class="explanation">{report.score.explanation}</p>
-      {#if report.score.rawScore !== report.score.score}
-        <div class="raw-score">
-          Raw score: {report.score.rawScore} / {report.score.maxRawScore}
-        </div>
-      {/if}
+<!-- Hero: gauge card -->
+<section class="card hero-card">
+  <div class="gauge-wrap">
+    <svg class="gauge" viewBox="0 0 180 100" aria-hidden="true">
+      <!-- Background track -->
+      <path
+        d="M 10 90 A 80 80 0 0 1 170 90"
+        fill="none"
+        stroke="var(--border)"
+        stroke-width="8"
+        stroke-linecap="round"
+      />
+      <!-- Fill arc -->
+      <path
+        d={arcPath}
+        fill="none"
+        stroke={statusColor}
+        stroke-width="8"
+        stroke-linecap="round"
+        style="transition: stroke 0.3s ease;"
+      />
+    </svg>
+    <div class="gauge-center">
+      <span class="gauge-score" style="color: {statusColor}">{score}</span>
+      <span class="gauge-max">/ 100</span>
     </div>
-  </details>
+  </div>
+  <div class="hero-meta">
+    <div class="status-badge" style="background: {statusBg}; color: {statusColor}">
+      <span class="status-dot" style="background: {statusColor}"></span>
+      {statusLabel}
+    </div>
+    <p class="classification">{report.score.classification}</p>
+    <p class="explanation">{report.score.explanation}</p>
+    {#if report.score.rawScore !== report.score.score}
+      <p class="raw-score">Raw: {report.score.rawScore} / {report.score.maxRawScore}</p>
+    {/if}
+  </div>
+</section>
 
-  <details class="section" open>
-    <summary>Text Statistics</summary>
-    <dl class="stats-grid">
-      <div class="stat">
-        <dt>Characters</dt>
-        <dd>{report.statistics.characterCount}</dd>
-      </div>
-      <div class="stat">
-        <dt>Words</dt>
-        <dd>{report.statistics.wordCount}</dd>
-      </div>
-      <div class="stat">
-        <dt>Sentences</dt>
-        <dd>{report.statistics.sentenceCount}</dd>
-      </div>
-      <div class="stat">
-        <dt>Average Word Length</dt>
-        <dd>{report.statistics.averageWordLength.toFixed(2)}</dd>
-      </div>
-      <div class="stat">
-        <dt>Average Sentence Length</dt>
-        <dd>{report.statistics.averageSentenceLength.toFixed(2)}</dd>
-      </div>
-    </dl>
-  </details>
+<!-- Stat strip -->
+<section class="stat-strip">
+  <div class="stat-card">
+    <span class="stat-label">Characters</span>
+    <span class="stat-value">{fmt(report.statistics.characterCount)}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Words</span>
+    <span class="stat-value">{fmt(report.statistics.wordCount)}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Sentences</span>
+    <span class="stat-value">{fmt(report.statistics.sentenceCount)}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Avg word length</span>
+    <span class="stat-value">{fmtDec(report.statistics.averageWordLength)}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Avg sentence length</span>
+    <span class="stat-value">{fmtDec(report.statistics.averageSentenceLength)}</span>
+  </div>
+</section>
 
-  <details class="section" open>
-    <summary>Linguistic Factors</summary>
-    <ul class="factors-list">
+<!-- Detail cards: side by side on desktop -->
+<div class="detail-grid">
+  <!-- Linguistic signals -->
+  <section class="card">
+    <h2 class="card-title">Linguistic Signals</h2>
+    <ul class="factor-list">
       {#each report.linguistic.factors as factor}
-        <li class="factor" class:ai-signal={factor.isAISignal}>
-          <div class="factor-header">
-            <strong>{factor.name}</strong>
+        <li class="factor" class:flagged={factor.isAISignal}>
+          <div class="factor-top">
+            <div class="factor-id">
+              {#if factor.isAISignal}
+                <span class="dot dot-red"></span>
+                <span class="badge badge-red">AI signal</span>
+              {:else}
+                <span class="dot dot-green"></span>
+                <span class="badge badge-green">Normal</span>
+              {/if}
+            </div>
             <span class="factor-value">{factor.value}{factor.unit}</span>
-            {#if factor.isAISignal}
-              <span class="warning-badge" aria-label="AI signal detected">⚠</span>
-            {/if}
           </div>
-          <p class="factor-interpretation">{factor.interpretation}</p>
+          <span class="factor-name">{factor.name}</span>
+          <span class="factor-detail">{factor.interpretation}</span>
         </li>
       {/each}
     </ul>
-    <p class="overall-interpretation">{report.linguistic.overallInterpretation}</p>
-  </details>
+    <p class="factor-overall">{report.linguistic.overallInterpretation}</p>
+  </section>
 
-  <details class="section" open>
-    <summary>Patterns Detected</summary>
+  <!-- Patterns detected -->
+  <section class="card">
+    <h2 class="card-title">Patterns Detected</h2>
     {#if activeCategories.length > 0}
-      <ul class="categories-list">
+      <ul class="pattern-list">
         {#each activeCategories as category}
-          <li class="category">
-            <div class="category-header">
-              <strong>{category.name.toUpperCase()}</strong>
-              <span class="category-score">{category.score} / {category.maxScore}</span>
+          <li class="pattern">
+            <div class="pattern-header">
+              <span class="pattern-name">{category.name.toUpperCase()}</span>
+              <span class="pattern-score">{category.score} / {category.maxScore}</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: {pct(category.score, category.maxScore)}"></div>
             </div>
             {#if category.subcategories && category.subcategories.length > 0}
-              <ul class="subcategories-list">
-                {#each category.subcategories as subcategory}
-                  {#if subcategory.count > 0}
-                    <li class="subcategory">
-                      <span>{subcategory.name}</span>
-                      <span class="subcategory-meta">
-                        count: {subcategory.count}, score: {subcategory.score} / {subcategory.maxScore}
-                      </span>
+              <ul class="sub-list">
+                {#each category.subcategories as sub}
+                  {#if sub.count > 0}
+                    <li class="sub-item">
+                      <span class="sub-name">{sub.name}</span>
+                      <span class="sub-meta">{sub.count} match{sub.count === 1 ? '' : 'es'} · {sub.score} pts</span>
                     </li>
                   {/if}
                 {/each}
               </ul>
             {/if}
             {#if category.matches.length > 0 && category.matches.length <= 5}
-              <div class="matches">Matches: {category.matches.join(', ')}</div>
+              <div class="pattern-matches">{category.matches.join(', ')}</div>
             {/if}
           </li>
         {/each}
       </ul>
-      <div class="total">
-        Total: {report.patterns.totalScore} / {report.patterns.totalMaxScore}
-      </div>
     {:else}
-      <p class="empty">No patterns detected</p>
-      <div class="total">
-        Total: {report.patterns.totalScore} / {report.patterns.totalMaxScore}
-      </div>
+      <p class="empty">No patterns found in this text.</p>
     {/if}
-  </details>
+  </section>
 </div>
 
-<footer class="footer">
-  <p class="timestamp">Analyzed at {report.timestamp.local}</p>
-
-  <div class="breakdown">
-    <h3>Score Breakdown</h3>
-    {#if sortedContributions.length > 0}
-      <ul class="breakdown-list">
-        {#each sortedContributions as contribution}
-          <li class="breakdown-item">
-            <div class="breakdown-header">
-              <span class="breakdown-name">{contribution.category}</span>
-              <span class="breakdown-score">
-                {contribution.score} / {contribution.maxScore}
-              </span>
-            </div>
-            <p class="breakdown-explanation">{contribution.explanation}</p>
-          </li>
-        {/each}
-      </ul>
-    {:else}
-      <p class="empty">No score contributions</p>
-    {/if}
-  </div>
-</footer>
+<!-- Score breakdown -->
+<section class="card">
+  <h2 class="card-title">Score Breakdown</h2>
+  <ul class="breakdown-list">
+    {#each sortedContributions as c}
+      <li class="breakdown-row">
+        <span class="breakdown-name">{c.category}</span>
+        <div class="breakdown-bar">
+          <div class="breakdown-bar-fill" style="width: {pct(c.score, c.maxScore)}"></div>
+        </div>
+        <span class="breakdown-score">{c.score} / {c.maxScore}</span>
+        <span class="breakdown-pct">{pct(c.score, c.maxScore)}</span>
+      </li>
+    {/each}
+  </ul>
+  <div class="timestamp">Analyzed {report.timestamp.local}</div>
+</section>
 
 <style>
-  .report {
+  /* Card base */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .card-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+  }
+
+  /* Hero gauge card */
+  .hero-card {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 1.25rem;
   }
 
-  .section {
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    background-color: #ffffff;
+  .gauge-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 180px;
+    height: 100px;
   }
 
-  summary {
+  .gauge {
+    width: 100%;
+    height: 100%;
+  }
+
+  .gauge path[fill="none"]:not(:first-child) {
+    transition: stroke-dasharray 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+      stroke 0.3s ease;
+  }
+
+  .gauge-center {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+
+  .gauge-score {
+    font-family: var(--font-mono);
+    font-size: 2.25rem;
     font-weight: 700;
-    font-size: 1.125rem;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .score-section {
-    margin-top: 0.75rem;
-  }
-
-  .score-value {
-    font-size: 3rem;
-    font-weight: 800;
     line-height: 1;
   }
 
-  .score-label {
-    font-size: 1.25rem;
+  .gauge-max {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+    margin-left: 0.125rem;
+  }
+
+  .hero-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
     font-weight: 600;
-    margin-top: 0.25rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
   }
 
   .classification {
-    margin-top: 0.5rem;
-    color: #4b5563;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.375rem;
   }
 
   .explanation {
-    margin-top: 0.5rem;
-    color: #374151;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    max-width: 42ch;
   }
 
   .raw-score {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
     margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: #6b7280;
   }
 
-  .stats-grid {
+  /* Stat strip */
+  .stat-strip {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-    margin: 0.75rem 0 0 0;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
   }
 
-  .stat {
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.875rem 1rem;
     display: flex;
     flex-direction: column;
+    gap: 0.25rem;
   }
 
-  .stat dt {
-    font-size: 0.875rem;
-    color: #6b7280;
+  .stat-label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-tertiary);
   }
 
-  .stat dd {
-    margin: 0;
-    font-size: 1.25rem;
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 1.125rem;
     font-weight: 600;
+    color: var(--text);
   }
 
-  .factors-list,
-  .categories-list,
-  .subcategories-list,
-  .breakdown-list {
+  /* Detail grid */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Factor list */
+  .factor-list {
     list-style: none;
-    margin: 0.75rem 0 0 0;
-    padding: 0;
-  }
-
-  .factor,
-  .category,
-  .breakdown-item {
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    background-color: #f8fafc;
-  }
-
-  .factor:not(:last-child),
-  .category:not(:last-child),
-  .breakdown-item:not(:last-child) {
-    margin-bottom: 0.5rem;
-  }
-
-  .factor.ai-signal {
-    border-left: 4px solid var(--score-amber);
-  }
-
-  .factor-header,
-  .category-header,
-  .breakdown-header {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .factor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .factor-top {
+    display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: space-between;
+  }
+
+  .factor-id {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-green {
+    background: var(--status-green);
+  }
+
+  .dot-red {
+    background: var(--status-red);
+  }
+
+  .badge {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    padding: 0.0625rem 0.375rem;
+    border-radius: 3px;
+  }
+
+  .badge-green {
+    background: var(--status-green-bg);
+    color: var(--status-green);
+  }
+
+  .badge-red {
+    background: var(--status-red-bg);
+    color: var(--status-red);
   }
 
   .factor-value {
-    color: #4b5563;
-  }
-
-  .warning-badge {
-    color: var(--score-amber);
-    font-weight: 700;
-  }
-
-  .factor-interpretation,
-  .breakdown-explanation {
-    margin: 0.25rem 0 0 0;
-    font-size: 0.95rem;
-    color: #4b5563;
-  }
-
-  .overall-interpretation {
-    margin-top: 1rem;
-    font-weight: 500;
-  }
-
-  .category-score {
-    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
     font-weight: 600;
+    color: var(--text);
   }
 
-  .subcategories-list {
-    margin-top: 0.5rem;
+  .factor-name {
+    font-size: 0.8125rem;
+    color: var(--text);
   }
 
-  .subcategory {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 0.25rem 0;
-    font-size: 0.95rem;
+  .factor-detail {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
   }
 
-  .subcategory-meta {
-    color: #6b7280;
-    font-size: 0.875rem;
-  }
-
-  .matches {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: #4b5563;
-  }
-
-  .total {
+  .factor-overall {
     margin-top: 1rem;
-    font-weight: 700;
-  }
-
-  .empty {
-    color: #6b7280;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
     font-style: italic;
   }
 
-  .footer {
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e2e8f0;
+  /* Pattern list */
+  .pattern-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
   }
 
-  .timestamp {
-    margin: 0 0 1rem 0;
+  .pattern-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+  }
+
+  .pattern-name {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .pattern-score {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+  }
+
+  .bar-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .sub-list {
+    list-style: none;
+    margin-top: 0.625rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .sub-item {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+  }
+
+  .sub-name {
+    color: var(--text-secondary);
+  }
+
+  .sub-meta {
+    color: var(--text-tertiary);
+  }
+
+  .pattern-matches {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    font-style: italic;
+  }
+
+  .empty {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-tertiary);
+    font-style: italic;
   }
 
-  .breakdown h3 {
-    margin: 0 0 0.75rem 0;
-    font-size: 1rem;
+  /* Score breakdown */
+  .breakdown-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .breakdown-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto auto;
+    align-items: center;
+    gap: 1rem;
   }
 
   .breakdown-name {
-    font-weight: 600;
+    font-size: 0.8125rem;
+    color: var(--text);
+  }
+
+  .breakdown-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .breakdown-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .breakdown-score {
-    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+  }
+
+  .breakdown-pct {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
     font-weight: 600;
+    color: var(--text);
+    min-width: 2.5rem;
+    text-align: right;
+  }
+
+  .timestamp {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--text-tertiary);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .detail-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stat-strip {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   @media (max-width: 480px) {
-    .score-value {
-      font-size: 2.5rem;
+    .hero-card {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
     }
 
-    .stats-grid {
-      grid-template-columns: 1fr 1fr;
+    .hero-meta {
+      text-align: center;
+    }
+
+    .status-badge {
+      justify-content: center;
+    }
+
+    .breakdown-row {
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem;
+    }
+
+    .breakdown-bar,
+    .breakdown-score {
+      display: none;
     }
   }
 </style>

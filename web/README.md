@@ -71,6 +71,51 @@ jobs:
         uses: actions/deploy-pages@v4
 ```
 
+## API
+
+A headless HTTP API is available at `POST /api/analyze` via Cloudflare Pages
+Functions. It runs the same analysis core as the web app, server-side, and
+returns the full report as JSON.
+
+### Usage
+
+```bash
+curl -X POST https://your-domain.pages.dev/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Paste text to analyze here."}'
+```
+
+### Response
+
+**Success (200):**
+
+```json
+{
+  "report": {
+    "timestamp": { "iso": "...", "local": "..." },
+    "statistics": { "characterCount": 123, "wordCount": 45, ... },
+    "linguistic": { "factors": [...], "overallScore": 3, ... },
+    "patterns": { "categories": [...], "totalScore": 20, ... },
+    "score": { "score": 57, "classification": "Possibly AI-Generated", ... },
+    "contributions": [...]
+  }
+}
+```
+
+**Errors:**
+
+| Status | Cause |
+| --- | --- |
+| 400 | Missing or empty `text` field, malformed JSON |
+| 405 | Non-POST request |
+| 413 | Text exceeds 100,000 characters |
+| 500 | Analysis failure |
+
+All errors return `{ "error": "..." }` with a plain-English message.
+
+CORS is permissive (`Access-Control-Allow-Origin: *`) so the API is callable
+from browser-based tools on any domain.
+
 ## Architecture
 
 ```
@@ -78,17 +123,21 @@ web/
 ├── package.json          # Svelte 4 + Vite 5
 ├── vite.config.ts        # @ alias → ../src (shared core)
 ├── tsconfig.json
+├── wrangler.jsonc        # Cloudflare Pages config
 ├── index.html
+├── functions/
+│   └── api/
+│       └── analyze.ts    # POST /api/analyze — headless JSON API
 └── src/
     ├── main.ts           # Svelte mount point
     ├── app.css           # global styles + CSS variables
     ├── App.svelte        # state: input ↔ results toggle
     └── components/
         ├── TextInput.svelte    # textarea + file upload + drag-drop
-        └── ReportView.svelte   # full report, collapsible <details> sections
+        └── ReportView.svelte   # dashboard: gauge, stat strip, detail cards
 ```
 
 The shared analysis core lives in `../src/` and is unchanged by the web app.
 The only modification to `src/` is a barrel refactor that removes `chalk`
 re-exports from `scoring/index.ts` and `report/index.ts` so the core is
-browser-safe.
+browser-safe and Workers-safe.

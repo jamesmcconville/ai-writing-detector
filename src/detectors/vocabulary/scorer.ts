@@ -1,7 +1,7 @@
 import { scanForVocabulary, type VocabularyMatch } from './scanner.js';
 import { detectPhrases, type PhraseMatch } from './phrase-detector.js';
 
-export const MAX_VOCABULARY_SCORE = 15;
+export const MAX_VOCABULARY_SCORE = 24;
 export const POINTS_PER_TERM = 3;
 
 export interface VocabularyScoreResult {

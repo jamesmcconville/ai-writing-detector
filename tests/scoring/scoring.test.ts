@@ -55,25 +55,25 @@ describe('Score Aggregator', () => {
 
 describe('Score Normalizer', () => {
   it('should return score unchanged when below 100', () => {
-    expect(normalizeScore(50, 121)).toBe(50);
-    expect(normalizeScore(0, 121)).toBe(0);
-    expect(normalizeScore(99.9, 121)).toBe(99.9);
+    expect(normalizeScore(50, 130)).toBe(50);
+    expect(normalizeScore(0, 130)).toBe(0);
+    expect(normalizeScore(99.9, 130)).toBe(99.9);
   });
 
   it('should normalize score proportionally when above 100', () => {
-    const result = normalizeScore(121, 121);
+    const result = normalizeScore(130, 130);
     expect(result).toBe(100);
   });
 
   it('should preserve relative proportions when normalizing', () => {
     const rawScore = 110;
-    const result = normalizeScore(rawScore, 121);
-    const expected = (110 / 121) * 100;
+    const result = normalizeScore(rawScore, 130);
+    const expected = (110 / 130) * 100;
     expect(result).toBeCloseTo(expected, 0);
   });
 
   it('should round to one decimal place', () => {
-    const result = normalizeScore(100.5, 121);
+    const result = normalizeScore(100.5, 130);
     expect(result.toString()).toMatch(/^\d+\.?\d?$/);
   });
 });

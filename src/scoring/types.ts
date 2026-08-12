@@ -35,7 +35,7 @@ export interface AggregatedScore {
   contributions: ScoreContributor[];
   /** Sum of all raw scores (may exceed 100) */
   rawTotal: number;
-  /** Sum of all max scores (121 for current detector set) */
+  /** Sum of all max scores (130 for current detector set) */
   maxPossible: number;
 }
 
@@ -71,7 +71,7 @@ export interface ScoringResult {
 }
 
 // Constants for scoring
-export const MAX_RAW_SCORE = 121; // 15 (vocab) + 34 (structural) + 30 (vague) + 30 (promotional) + 12 (statistical)
+export const MAX_RAW_SCORE = 130; // 24 (vocab) + 34 (structural) + 30 (vague) + 30 (promotional) + 12 (statistical)
 export const HUMAN_THRESHOLD = 30;
 export const AI_THRESHOLD = 60;
 export const MAX_NORMALIZED_SCORE = 100;

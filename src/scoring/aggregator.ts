@@ -5,7 +5,7 @@ import { scoreVagueClaims } from '../detectors/vague/scorer.js';
 import { scorePromotional } from '../detectors/promotional/scorer.js';
 import { aggregateStatistics } from '../analyzers/aggregator.js';
 
-const MAX_POSSIBLE_RAW = 121;
+const MAX_POSSIBLE_RAW = 130;
 
 export function aggregateScores(text: string): AggregatedScore {
   if (!text || text.trim().length === 0) {

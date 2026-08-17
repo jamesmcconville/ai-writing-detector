@@ -1,4 +1,6 @@
 import { aggregatePromotionalPatterns } from './aggregator.js';
+import { extractSentence } from '@/utils/sentence-extractor.js';
+import type { MatchExample } from '@/report/types.js';
 
 export const MAX_EMPHASIS_SCORE = 10;
 export const MAX_PROMOTIONAL_SCORE = 12;
@@ -16,6 +18,7 @@ export interface PromotionalSubcategory {
   maxScore: number;
   matches: string[];
   count: number;
+  examples: MatchExample[];
 }
 
 export interface PromotionalScoreResult {
@@ -24,6 +27,7 @@ export interface PromotionalScoreResult {
   totalScore: number;
   maxScore: number;
   explanation: string;
+  examples: MatchExample[];
 }
 
 export function scorePromotional(text: string): PromotionalScoreResult {
@@ -34,6 +38,7 @@ export function scorePromotional(text: string): PromotionalScoreResult {
       totalScore: 0,
       maxScore: MAX_PROMOTIONAL_LANGUAGE_SCORE,
       explanation: 'No text to analyze',
+      examples: [],
     };
   }
 
@@ -54,6 +59,37 @@ export function scorePromotional(text: string): PromotionalScoreResult {
     MAX_ELEGANT_VARIATION_SCORE,
   );
 
+  const emphasisExamples: MatchExample[] = matches.undueEmphasis.map((m) => {
+    const start = m.position;
+    const end = m.position + m.term.length;
+    const context = extractSentence(text, start, end);
+    return {
+      term: m.term,
+      sentence: context.sentence,
+      start,
+      end,
+      category: 'promotional-language',
+      subcategory: 'undue-emphasis',
+    };
+  });
+
+  const promotionalExamples: MatchExample[] = matches.promotionalLanguage.map((m) => {
+    const start = m.position;
+    const end = m.position + m.phrase.length;
+    const context = extractSentence(text, start, end);
+    return {
+      term: m.phrase,
+      sentence: context.sentence,
+      start,
+      end,
+      category: 'promotional-language',
+      subcategory: 'promotional-language',
+    };
+  });
+
+  // Elegant variation matches do not carry position information, so we cannot extract sentence context.
+  const variationExamples: MatchExample[] = [];
+
   const subcategories: PromotionalSubcategory[] = [
     {
       name: 'undue-emphasis',
@@ -61,6 +97,7 @@ export function scorePromotional(text: string): PromotionalScoreResult {
       maxScore: MAX_EMPHASIS_SCORE,
       matches: matches.undueEmphasis.map((m) => m.term),
       count: matches.undueEmphasis.length,
+      examples: emphasisExamples,
     },
     {
       name: 'promotional-language',
@@ -68,6 +105,7 @@ export function scorePromotional(text: string): PromotionalScoreResult {
       maxScore: MAX_PROMOTIONAL_SCORE,
       matches: matches.promotionalLanguage.map((m) => m.phrase),
       count: matches.promotionalLanguage.length,
+      examples: promotionalExamples,
     },
     {
       name: 'elegant-variation',
@@ -75,6 +113,7 @@ export function scorePromotional(text: string): PromotionalScoreResult {
       maxScore: MAX_ELEGANT_VARIATION_SCORE,
       matches: matches.elegantVariation.map((m) => `${m.found.join(', ')}`),
       count: matches.elegantVariation.length,
+      examples: variationExamples,
     },
   ];
 
@@ -84,6 +123,8 @@ export function scorePromotional(text: string): PromotionalScoreResult {
     matches.undueEmphasis.length +
     matches.promotionalLanguage.length +
     matches.elegantVariation.length;
+
+  const examples = [...emphasisExamples, ...promotionalExamples, ...variationExamples];
 
   const explanation =
     totalPatterns === 0
@@ -96,5 +137,6 @@ export function scorePromotional(text: string): PromotionalScoreResult {
     totalScore,
     maxScore: MAX_PROMOTIONAL_LANGUAGE_SCORE,
     explanation,
+    examples,
   };
 }

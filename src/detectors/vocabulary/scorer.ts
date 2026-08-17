@@ -1,5 +1,7 @@
 import { scanForVocabulary, type VocabularyMatch } from './scanner.js';
 import { detectPhrases, type PhraseMatch } from './phrase-detector.js';
+import { extractSentence } from '@/utils/sentence-extractor.js';
+import type { MatchExample } from '@/report/types.js';
 
 export const MAX_VOCABULARY_SCORE = 24;
 export const POINTS_PER_TERM = 3;
@@ -11,6 +13,7 @@ export interface VocabularyScoreResult {
   score: number;
   maxScore: number;
   explanation: string;
+  examples: MatchExample[];
 }
 
 export function scoreVocabulary(text: string): VocabularyScoreResult {
@@ -22,6 +25,7 @@ export function scoreVocabulary(text: string): VocabularyScoreResult {
       score: 0,
       maxScore: MAX_VOCABULARY_SCORE,
       explanation: 'No text to analyze',
+      examples: [],
     };
   }
 
@@ -47,6 +51,35 @@ export function scoreVocabulary(text: string): VocabularyScoreResult {
     ...phraseMatches.map((m: PhraseMatch) => m.phrase),
   ];
 
+  const examples: MatchExample[] = [
+    ...wordMatches.map((m: VocabularyMatch) => {
+      const start = m.position;
+      const end = m.position + m.term.length;
+      const context = extractSentence(text, start, end);
+      return {
+        term: m.term,
+        sentence: context.sentence,
+        start,
+        end,
+        category: 'vocabulary',
+        subcategory: 'ai-vocabulary',
+      };
+    }),
+    ...phraseMatches.map((m: PhraseMatch) => {
+      const start = m.position;
+      const end = m.position + m.phrase.length;
+      const context = extractSentence(text, start, end);
+      return {
+        term: m.phrase,
+        sentence: context.sentence,
+        start,
+        end,
+        category: 'vocabulary',
+        subcategory: 'ai-phrases',
+      };
+    }),
+  ];
+
   const explanation =
     distinctCount === 0
       ? 'No AI vocabulary terms detected'
@@ -59,5 +92,6 @@ export function scoreVocabulary(text: string): VocabularyScoreResult {
     score,
     maxScore: MAX_VOCABULARY_SCORE,
     explanation,
+    examples,
   };
 }

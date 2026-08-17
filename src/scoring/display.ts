@@ -46,6 +46,17 @@ export function displayContribution(contribution: ScoreContributor): string {
     }
   }
 
+  if (contribution.examples && contribution.examples.length > 0) {
+    const shownExamples = contribution.examples.slice(0, 3);
+    lines.push('  Examples:');
+    for (const example of shownExamples) {
+      lines.push(chalk.dim(`    • "${example.sentence}"`));
+    }
+    if (contribution.examples.length > 3) {
+      lines.push(chalk.dim(`    ... and ${contribution.examples.length - 3} more`));
+    }
+  }
+
   lines.push('');
   return lines.join('\n');
 }

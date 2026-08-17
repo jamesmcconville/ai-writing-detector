@@ -1,3 +1,5 @@
+import type { MatchExample } from '../report/types.js';
+
 /**
  * Scoring system types and interfaces for aggregating all detector results
  * into a unified 0-100 probability score.
@@ -14,6 +16,7 @@ export interface ScoreContributor {
   explanation: string;
   matches?: string[];
   subcategories?: SubcategoryResult[];
+  examples?: MatchExample[];
 }
 
 /**
@@ -25,6 +28,7 @@ export interface SubcategoryResult {
   maxScore: number;
   matches: string[];
   count: number;
+  examples?: MatchExample[];
 }
 
 /**

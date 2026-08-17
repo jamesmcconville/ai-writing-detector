@@ -1,5 +1,13 @@
-import type { ScoringResult, ScoreContributor } from '../scoring/types.js';
-import type { StatisticalAnalysisResult } from '../analyzers/aggregator.js';
+import type { ScoreContributor } from '../scoring/types.js';
+
+export interface MatchExample {
+  term: string;
+  sentence: string;
+  start: number;
+  end: number;
+  category: string;
+  subcategory: string;
+}
 
 export interface ReportTimestamp {
   iso: string;
@@ -35,6 +43,7 @@ export interface PatternCategory {
   matchCount: number;
   matches: string[];
   subcategories?: PatternSubcategory[];
+  examples?: MatchExample[];
 }
 
 export interface PatternSubcategory {
@@ -43,6 +52,7 @@ export interface PatternSubcategory {
   maxScore: number;
   count: number;
   matches: string[];
+  examples?: MatchExample[];
 }
 
 export interface PatternsSection {

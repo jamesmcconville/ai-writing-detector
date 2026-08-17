@@ -107,6 +107,18 @@ export function formatReport(report: Report): string {
       if (category.matches.length > 0 && category.matches.length <= 5) {
         lines.push(chalk.dim(`    Found: ${category.matches.join(', ')}`));
       }
+
+      if (category.examples && category.examples.length > 0) {
+        const shownExamples = category.examples.slice(0, 3);
+        for (const example of shownExamples) {
+          lines.push(
+            chalk.dim(`    • "${example.sentence}"`),
+          );
+        }
+        if (category.examples.length > 3) {
+          lines.push(chalk.dim(`    ... and ${category.examples.length - 3} more`));
+        }
+      }
     }
   }
   lines.push('');

@@ -1,4 +1,6 @@
 import { aggregateStructuralPatterns } from './aggregator.js';
+import { extractSentence } from '@/utils/sentence-extractor.js';
+import type { MatchExample } from '@/report/types.js';
 
 export const MAX_RULE_OF_THREE_SCORE = 10;
 export const MAX_NEGATIVE_PARALLELISM_SCORE = 8;
@@ -15,12 +17,33 @@ const POINTS_PER_NEGATIVE_PARALLELISM = 2;
 const POINTS_PER_OUTLINE_CONCLUSION = 5;
 const POINTS_PER_FALSE_RANGE = 2;
 
+function buildStructuralExamples(
+  text: string,
+  matches: Array<{ text: string; position: number }>,
+  subcategory: string,
+): MatchExample[] {
+  return matches.map((m) => {
+    const start = m.position;
+    const end = m.position + m.text.length;
+    const context = extractSentence(text, start, end);
+    return {
+      term: m.text,
+      sentence: context.sentence,
+      start,
+      end,
+      category: 'structural',
+      subcategory,
+    };
+  });
+}
+
 export interface StructuralSubcategory {
   name: string;
   score: number;
   maxScore: number;
   matches: string[];
   count: number;
+  examples: MatchExample[];
 }
 
 export interface StructuralScoreResult {
@@ -29,6 +52,7 @@ export interface StructuralScoreResult {
   totalScore: number;
   maxScore: number;
   explanation: string;
+  examples: MatchExample[];
 }
 
 export function scoreStructural(text: string): StructuralScoreResult {
@@ -39,6 +63,7 @@ export function scoreStructural(text: string): StructuralScoreResult {
       totalScore: 0,
       maxScore: MAX_STRUCTURAL_SCORE,
       explanation: 'No text to analyze',
+      examples: [],
     };
   }
 
@@ -64,6 +89,23 @@ export function scoreStructural(text: string): StructuralScoreResult {
     MAX_FALSE_RANGES_SCORE,
   );
 
+  const ruleOfThreeExamples = buildStructuralExamples(
+    text,
+    matches.ruleOfThree,
+    'rule-of-three',
+  );
+  const negativeParallelismExamples = buildStructuralExamples(
+    text,
+    matches.negativeParallelism,
+    'negative-parallelism',
+  );
+  const outlineConclusionsExamples = buildStructuralExamples(
+    text,
+    matches.outlineConclusions,
+    'outline-conclusions',
+  );
+  const falseRangesExamples = buildStructuralExamples(text, matches.falseRanges, 'false-ranges');
+
   const subcategories: StructuralSubcategory[] = [
     {
       name: 'rule-of-three',
@@ -71,6 +113,7 @@ export function scoreStructural(text: string): StructuralScoreResult {
       maxScore: MAX_RULE_OF_THREE_SCORE,
       matches: matches.ruleOfThree.map((m) => m.text),
       count: matches.ruleOfThree.length,
+      examples: ruleOfThreeExamples,
     },
     {
       name: 'negative-parallelism',
@@ -78,6 +121,7 @@ export function scoreStructural(text: string): StructuralScoreResult {
       maxScore: MAX_NEGATIVE_PARALLELISM_SCORE,
       matches: matches.negativeParallelism.map((m) => m.text),
       count: matches.negativeParallelism.length,
+      examples: negativeParallelismExamples,
     },
     {
       name: 'outline-conclusions',
@@ -85,6 +129,7 @@ export function scoreStructural(text: string): StructuralScoreResult {
       maxScore: MAX_OUTLINE_CONCLUSIONS_SCORE,
       matches: matches.outlineConclusions.map((m) => m.text),
       count: matches.outlineConclusions.length,
+      examples: outlineConclusionsExamples,
     },
     {
       name: 'false-ranges',
@@ -92,6 +137,7 @@ export function scoreStructural(text: string): StructuralScoreResult {
       maxScore: MAX_FALSE_RANGES_SCORE,
       matches: matches.falseRanges.map((m) => m.text),
       count: matches.falseRanges.length,
+      examples: falseRangesExamples,
     },
   ];
 
@@ -104,6 +150,13 @@ export function scoreStructural(text: string): StructuralScoreResult {
     matches.outlineConclusions.length +
     matches.falseRanges.length;
 
+  const examples = [
+    ...ruleOfThreeExamples,
+    ...negativeParallelismExamples,
+    ...outlineConclusionsExamples,
+    ...falseRangesExamples,
+  ];
+
   const explanation =
     totalPatterns === 0
       ? 'No structural patterns detected'
@@ -115,5 +168,6 @@ export function scoreStructural(text: string): StructuralScoreResult {
     totalScore,
     maxScore: MAX_STRUCTURAL_SCORE,
     explanation,
+    examples,
   };
 }

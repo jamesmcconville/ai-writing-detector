@@ -50,6 +50,21 @@
   function pct(n: number, total: number): string {
     return total > 0 ? Math.round((n / total) * 100) + '%' : '0%';
   }
+
+  function highlightBefore(sentence: string, term: string): string {
+    const idx = sentence.toLowerCase().indexOf(term.toLowerCase());
+    return idx === -1 ? sentence : sentence.slice(0, idx);
+  }
+
+  function highlightMatch(sentence: string, term: string): string {
+    const idx = sentence.toLowerCase().indexOf(term.toLowerCase());
+    return idx === -1 ? '' : sentence.slice(idx, idx + term.length);
+  }
+
+  function highlightAfter(sentence: string, term: string): string {
+    const idx = sentence.toLowerCase().indexOf(term.toLowerCase());
+    return idx === -1 ? '' : sentence.slice(idx + term.length);
+  }
 </script>
 
 <!-- Hero: gauge card -->
@@ -170,7 +185,18 @@
                 {/each}
               </ul>
             {/if}
-            {#if category.matches.length > 0 && category.matches.length <= 5}
+            {#if category.examples && category.examples.length > 0}
+              <div class="examples">
+                {#each category.examples as example}
+                  <details class="example-row">
+                    <summary class="example-term">{example.term}</summary>
+                    <p class="example-sentence">
+                      {highlightBefore(example.sentence, example.term)}<strong class="highlight">{highlightMatch(example.sentence, example.term)}</strong>{highlightAfter(example.sentence, example.term)}
+                    </p>
+                  </details>
+                {/each}
+              </div>
+            {:else if category.matches.length > 0 && category.matches.length <= 5}
               <div class="pattern-matches">{category.matches.join(', ')}</div>
             {/if}
           </li>
@@ -502,6 +528,58 @@
     font-size: 0.75rem;
     color: var(--text-tertiary);
     font-style: italic;
+  }
+
+  .examples {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .example-row {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .example-term {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .example-term::-webkit-details-marker {
+    display: none;
+  }
+
+  .example-term::before {
+    content: '+';
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  details[open] > .example-term::before {
+    content: '−';
+  }
+
+  .example-sentence {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--text);
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    line-height: 1.5;
+  }
+
+  .highlight {
+    color: var(--accent);
   }
 
   .empty {

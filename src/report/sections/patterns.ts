@@ -12,12 +12,14 @@ export function buildPatternsSection(contributions: ScoreContributor[]): Pattern
       ? c.subcategories.reduce((sum, s) => sum + s.count, 0)
       : c.matches?.length || 0,
     matches: c.matches || [],
+    examples: c.examples || [],
     subcategories: c.subcategories?.map((s) => ({
       name: s.name,
       score: s.score,
       maxScore: s.maxScore,
       count: s.count,
       matches: s.matches,
+      examples: s.examples || [],
     })),
   }));
 
